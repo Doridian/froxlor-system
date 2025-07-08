@@ -4,7 +4,7 @@ from socket import getfqdn
 from os.path import dirname, abspath
 
 fqdn = getfqdn()
-domains = [fqdn, f"www.{fqdn}", "mysql.doridian.net"]
+domains = [fqdn, f"www.{fqdn}"]
 
 sql_domains = check_output(["mysql", "--batch", "-e", "select domain, wwwserveralias from froxlor.panel_domains;"], encoding="utf-8").splitlines()
 sql_columns = None
