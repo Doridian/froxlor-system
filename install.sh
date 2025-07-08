@@ -18,6 +18,8 @@ find etc -type f -exec /bin/sh -c 'envsubst < "$1" > "build/$1"' -- {} \;
 
 cp -rv build/etc/* /etc/
 
+rm -rf build
+
 echo 'Adjusting postfix configuration...'
 postconf "smtpd_tls_cert_file=$CERTDIR/cert.pem"
 postconf "smtpd_tls_key_file=$CERTDIR/privkey.pem"
