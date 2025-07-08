@@ -20,7 +20,18 @@ for line in sql_domains:
 	if has_www:
 		domains.append(f"www.{domain}")
 
-cmd = ["certbot", "certonly", "--expand", "--webroot", "-w", "/var/www/html/froxlor", "--deploy-hook", "/root/froxlor-letsencrypt-system/renew.sh"]
+cmd = [
+	"certbot",
+	"certonly",
+	"--non-interactive",
+	"--expand",
+	"--webroot",
+	"-w",
+	"/var/www/html/froxlor",
+	"--deploy-hook",
+	"/root/froxlor-letsencrypt-system/renew.sh",
+]
+
 for dom in domains:
 	cmd += ["-d", dom]
 
