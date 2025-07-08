@@ -1,11 +1,8 @@
 #!/bin/bash
 set -euo pipefail
-
-FQDN=$(hostname -f)
-
 cd "$(dirname "$0")"
 
-export CERTDIR="/etc/letsencrypt/live/$FQDN"
+export CERTDIR="/etc/letsencrypt/live/$(hostname -f)"
 
 echo 'Ensuring all LetsEncrypt certificates are present...'
 ./build_cmd.py | sh -x
