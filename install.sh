@@ -3,18 +3,25 @@ set -euo pipefail
 
 FQDN=$(hostname -f)
 
-cd /root/froxlor-letsencrypt-system
+cd "$(dirname "$0")"
 
-if [ ! -d "/etc/letsencrypt/live/$FQDN" ]; then
-	echo 'LetsEncrypt certs missing, please run'
-	./build_cmd.py
-	exit 1
-fi
+export CERTDIR="/etc/letsencrypt/live/$FQDN"
 
-cp -rv etc/* /etc/
+echo 'Ensuring all LetsEncrypt certificates are present...'
+./build_cmd.py | sh -x
 
-postconf "smtpd_tls_cert_file=/etc/letsencrypt/live/$FQDN/cert.pem"
-postconf "smtpd_tls_key_file=/etc/letsencrypt/live/$FQDN/privkey.pem"
-postconf "smtpd_tls_CAfile=/etc/letsencrypt/live/$FQDN/chain.pem"
+echo 'Rendering system configuration files...'
+rm -rf build && mkdir -p build
 
+find etc -type d -exec mkdir -p "build/"{} \;
+find etc -type f -exec /bin/sh -c 'envsubst < "$1" > "build/$1"' -- {} \;
+
+cp -rv build/etc/* /etc/
+
+echo 'Adjusting postfix configuration...'
+postconf "smtpd_tls_cert_file=$CERTDIR/cert.pem"
+postconf "smtpd_tls_key_file=$CERTDIR/privkey.pem"
+postconf "smtpd_tls_CAfile=$CERTDIR/chain.pem"
+
+echo 'Restarting services...'
 ./renew.sh

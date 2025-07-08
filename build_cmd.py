@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from subprocess import check_output
 from socket import getfqdn
+from os.path import dirname, abspath
 
 fqdn = getfqdn()
 domains = [fqdn, f"www.{fqdn}", "mysql.doridian.net"]
@@ -31,7 +32,7 @@ cmd = [
 	"-w",
 	"/var/www/html/froxlor",
 	"--deploy-hook",
-	"/root/froxlor-letsencrypt-system/renew.sh",
+	f"{abspath(dirname(__file__))}/renew.sh",
 ]
 
 for dom in domains:
