@@ -14,3 +14,4 @@ rsync -trv --delete /var/customers/mail/ /mnt/backups/mail/
 
 echo 'Backing up MySQL databases...'
 mariadb-backup --backup --target-dir /mnt/backups/mysql
+mariadb-backup --prepare --target-dir /mnt/backups/mysql
