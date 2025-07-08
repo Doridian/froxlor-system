@@ -1,7 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-chmod 700 /mnt/backups
 mkdir -p /mnt/backups/webs /mnt/backups/mail
 chmod 700 /mnt/backups/webs /mnt/backups/mail
 
