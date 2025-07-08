@@ -3,6 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 export CERTDIR="/etc/letsencrypt/live/$(hostname -f)"
+export INSTALLDIR="$(pwd)"
 
 echo 'Ensuring all LetsEncrypt certificates are present...'
 ./build_cmd.py | sh -x
@@ -24,3 +25,4 @@ postconf "smtpd_tls_CAfile=$CERTDIR/chain.pem"
 
 echo 'Restarting services...'
 ./renew.sh
+systemctl restart cron

@@ -1,0 +1,1 @@
+13 3 * * * root /usr/bin/nice -n 5 ${INSTALLDIR}/backup.sh > /dev/null
