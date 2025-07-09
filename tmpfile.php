@@ -16,11 +16,7 @@ class SafeTempFile {
         chmod($this->tmpname, $chmod);
 
         register_shutdown_function(function() {
-            try {
-                $this->close();
-            } catch (Exception $e) {
-                echo "Error during shutdown: " . $e->getMessage() . "\n";
-            }
+            $this->remove();
         });
     }
 
@@ -37,14 +33,26 @@ class SafeTempFile {
         $this->write($data . "\n");
     }
 
-    public function close() {
+    private function closefh() {
         if (empty($this->fh)) {
-            return;
+            return false;
         }
         fclose($this->fh);
         unset($this->fh);
+        return true;
+    }
+
+    public function close() {
+        if (!$this->closefh()) {
+            return;
+        }
         if (!rename($this->tmpname, $this->name)) {
             throw new Exception("Could not rename temporary file to final name: $this->name");
         }
+    }
+
+    public function remove() {
+        $this->closefh();
+        @unlink($this->tmpname);
     }
 }
