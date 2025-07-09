@@ -16,7 +16,11 @@ class SafeTempFile {
         chmod($this->tmpname, $chmod);
 
         register_shutdown_function(function() {
-            $this->close();
+            try {
+                $this->close();
+            } catch (Exception $e) {
+                echo "Error during shutdown: " . $e->getMessage() . "\n";
+            }
         });
     }
 
