@@ -2,26 +2,24 @@
 <?php
 
 require_once 'shared.php';
+require_once 'tmpfile.php';
 
 // TODO: Detect if certificates were updated since last run
 //       and only update if they were changed.
 // TODO: Write to temp files and then move them to the final location
 
-$postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
-chmod('/etc/postfix/tls_server_sni_maps', 0640);
+$postfix_map = new SafeTempFile('/etc/postfix/tls_server_sni_maps', 0640);
+$dovecot_tls = new SafeTempFile('/etc/dovecot/conf.d/zzz-tls-sni.conf');
 
-$dovecot_tls_fh = fopen('/etc/dovecot/conf.d/zzz-tls-sni.conf', 'w');
+$pureftpd_tls = new SafeTempFile('/etc/pure-ftpd/certd.sh', 0755);
+$pureftpd_tls->write("#!/bin/bash\n");
+$pureftpd_tls->write("set -euo pipefail\n");
 
-$pureftpd_tls_fh = fopen('/etc/pure-ftpd/certd.sh', 'w');
-fwrite($pureftpd_tls_fh, "#!/bin/bash\n");
-fwrite($pureftpd_tls_fh, "set -euo pipefail\n");
-chmod('/etc/pure-ftpd/certd.sh', 0755);
+$pureftpd_tls->write("echo 'action:strict'\n");
+$pureftpd_tls->write('case "$CERTD_SNI_NAME" in' . "\n");
 
-fwrite($pureftpd_tls_fh, "echo 'action:strict'\n");
-fwrite($pureftpd_tls_fh, 'case "$CERTD_SNI_NAME" in' . "\n");
-
-fwrite($dovecot_tls_fh, "ssl_cert = <$fqdn_fullchain_file\n");
-fwrite($dovecot_tls_fh, "ssl_key = <$fqdn_key_file\n");
+$dovecot_tls->write("ssl_cert = <$fqdn_fullchain_file\n");
+$dovecot_tls->write("ssl_key = <$fqdn_key_file\n");
 
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
@@ -83,32 +81,32 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     }
 
     foreach ($domains as $domain) {
-        fwrite($postfix_map_fh, $domain . ' ' . $key_file . ' ' . $fullchain_file . "\n");
+        $postfix_map->write($domain . ' ' . $key_file . ' ' . $fullchain_file . "\n");
 
-        fwrite($dovecot_tls_fh, 'local_name ' . $domain . " {\n");
-        fwrite($dovecot_tls_fh, "  ssl_cert = <$fullchain_file\n");
-        fwrite($dovecot_tls_fh, "  ssl_key = <$key_file\n");
-        fwrite($dovecot_tls_fh, "}\n");
+        $dovecot_tls->write('local_name ' . $domain . " {\n");
+        $dovecot_tls->write("  ssl_cert = <$fullchain_file\n");
+        $dovecot_tls->write("  ssl_key = <$key_file\n");
+        $dovecot_tls->write("}\n");
     }
 
-    fwrite($pureftpd_tls_fh, "  '" . implode("'|'", $domains) . "')\n");
-    fwrite($pureftpd_tls_fh, "    echo 'cert_file:$fullchain_file'\n");
-    fwrite($pureftpd_tls_fh, "    echo 'key_file:$key_file'\n");
-    fwrite($pureftpd_tls_fh, "    ;;\n");
+    $pureftpd_tls->write("  '" . implode("'|'", $domains) . "')\n");
+    $pureftpd_tls->write("    echo 'cert_file:$fullchain_file'\n");
+    $pureftpd_tls->write("    echo 'key_file:$key_file'\n");
+    $pureftpd_tls->write("    ;;\n");
 }
 
 unset($cert_row, $cert_res, $domain_raw, $fullchain_file, $key_file, $cert_data, $domains);
 
-fwrite($pureftpd_tls_fh, "  *)\n");
-fwrite($pureftpd_tls_fh, "    echo 'cert_file:" . $fqdn_fullchain_file . "'\n");
-fwrite($pureftpd_tls_fh, "    echo 'key_file:" . $fqdn_key_file . "'\n");
-fwrite($pureftpd_tls_fh, "    ;;\n");
-fwrite($pureftpd_tls_fh, "esac\n");
-fwrite($pureftpd_tls_fh, "echo 'end'\n");
+$pureftpd_tls->write("  *)\n");
+$pureftpd_tls->write("    echo 'cert_file:" . $fqdn_fullchain_file . "'\n");
+$pureftpd_tls->write("    echo 'key_file:" . $fqdn_key_file . "'\n");
+$pureftpd_tls->write("    ;;\n");
+$pureftpd_tls->write("esac\n");
+$pureftpd_tls->write("echo 'end'\n");
 
-fclose($postfix_map_fh);
-fclose($dovecot_tls_fh);
-fclose($pureftpd_tls_fh);
+$postfix_map->close();
+$dovecot_tls->close();
+$pureftpd_tls->close();
 
 verbose_run('postmap -F /etc/postfix/tls_server_sni_maps');
 chmod('/etc/postfix/tls_server_sni_maps.db', 0640);
