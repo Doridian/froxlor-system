@@ -3,6 +3,8 @@
 
 require_once 'shared.php';
 
+$fqdn = strtolower(trim(get_setting('system', 'hostname')));
+
 function fullchain_from_domain($domain) {
     global $ssl_dir;
     return $ssl_dir . $domain . '_fullchain.pem';
@@ -120,6 +122,18 @@ fclose($pureftpd_tls_fh);
 passthru('postmap -F /etc/postfix/tls_server_sni_maps');
 chmod('/etc/postfix/tls_server_sni_maps.db', 0640);
 chgrp('/etc/postfix/tls_server_sni_maps.db', 'postfix');
+
+function postconf($key, $value) {
+    $key = escapeshellarg($key);
+    $escaped_value = escapeshellarg($value);
+    passthru("postconf '$key=$escaped_value'");
+}
+
+postconf('smtpd_tls_cert_file', $ssl_dir . $domain . '.crt');
+postconf('smtpd_tls_key_file', $fqdn_key_file);
+postconf('smtpd_tls_CAfile', $ssl_dir . $domain . '_chain.pem');
+postconf('smtpd_tls_chain_files', $fqdn_key_file . ',' . $fqdn_fullchain_file);
+postconf('tls_server_sni_maps', 'hash:/etc/postfix/tls_server_sni_maps');
 
 passthru('systemctl restart dovecot');
 passthru('systemctl restart postfix');

@@ -4,7 +4,6 @@ cd "$(dirname "$0")"
 
 export INSTALLDIR="$(pwd)"
 export SSLDIR="$(php -r 'require_once "shared.php"; echo $ssl_dir;')"
-export FQDN="$(php -r 'require_once "shared.php"; echo $fqdn;')"
 
 set -x
 
@@ -22,14 +21,6 @@ if ! grep -qF ExtCert /usr/sbin/pure-ftpd-wrapper; then
 fi
 
 rm -rf build
-
-echo 'Adjusting postfix configuration...'
-postconf "smtpd_tls_cert_file=${SSLDIR}${FQDN}.crt"
-postconf "smtpd_tls_key_file=${SSLDIR}${FQDN}.key"
-postconf "smtpd_tls_CAfile=${SSLDIR}${FQDN}_chain.pem"
-postconf "smtpd_tls_chain_files=${SSLDIR}${FQDN}.key,${SSLDIR}${FQDN}_fullchain.pem"
-
-postconf 'tls_server_sni_maps=hash:/etc/postfix/tls_server_sni_maps'
 
 echo 'Running update...'
 systemctl daemon-reload
