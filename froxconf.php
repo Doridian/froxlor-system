@@ -74,6 +74,8 @@ while ($cert_row = $cert_res->fetch_assoc()) {
         }
     }
 
+    $domains = array_unique($domains);
+
     print_r($domains);
 
     $domains_str = implode(' ', $domains);
