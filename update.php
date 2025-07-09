@@ -18,16 +18,26 @@ chmod('/etc/pure-ftpd/certd.sh', 0755);
 fwrite($pureftpd_tls_fh, "echo 'action:strict'\n");
 fwrite($pureftpd_tls_fh, 'case "$CERTD_SNI_NAME" in' . "\n");
 
+function fullchain_from_domain($domain) {
+    global $ssl_dir;
+    return $ssl_dir . $domain . '_fullchain.pem';
+}
+
+function key_from_domain($domain) {
+    global $ssl_dir;
+    return $ssl_dir . $domain . '.key';
+}
+
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
     $domain_raw = $cert_row['domain'];
 
-    $fullchain_file = $ssl_dir . $domain_raw . '_fullchain.pem';
+    $fullchain_file = fullchain_from_domain($domain_raw);
     if (!file_exists($fullchain_file)) {
         echo "Skipping $domain_raw, fullchain file does not exist\n";
         continue;
     }
-    $key_file = $ssl_dir . $domain_raw . '.key';
+    $key_file = key_from_domain($domain_raw);
     if (!file_exists($key_file)) {
         echo "Skipping $domain_raw, key file does not exist\n";
         continue;
@@ -93,8 +103,8 @@ while ($cert_row = $cert_res->fetch_assoc()) {
 }
 
 fwrite($pureftpd_tls_fh, "  *)\n");
-fwrite($pureftpd_tls_fh, "    echo 'cert_file:" . $ssl_dir . $fqdn . "_fullchain.pem'\n");
-fwrite($pureftpd_tls_fh, "    echo 'key_file:" . $ssl_dir . $fqdn . ".key'\n");
+fwrite($pureftpd_tls_fh, "    echo 'cert_file:" . fullchain_from_domain($fqdn) . "'\n");
+fwrite($pureftpd_tls_fh, "    echo 'key_file:" . key_from_domain($fqdn) . "'\n");
 fwrite($pureftpd_tls_fh, "    ;;\n");
 fwrite($pureftpd_tls_fh, "esac\n");
 fwrite($pureftpd_tls_fh, "echo 'end'\n");
