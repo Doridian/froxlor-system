@@ -12,14 +12,14 @@ $postfix_map = new SafeTempFile('/etc/postfix/tls_server_sni_maps', 0640);
 $dovecot_tls = new SafeTempFile('/etc/dovecot/conf.d/zzz-tls-sni.conf');
 
 $pureftpd_tls = new SafeTempFile('/etc/pure-ftpd/certd.sh', 0755);
-$pureftpd_tls->write("#!/bin/bash\n");
-$pureftpd_tls->write("set -euo pipefail\n");
+$pureftpd_tls->writeln("#!/bin/bash");
+$pureftpd_tls->writeln("set -euo pipefail");
 
-$pureftpd_tls->write("echo 'action:strict'\n");
-$pureftpd_tls->write('case "$CERTD_SNI_NAME" in' . "\n");
+$pureftpd_tls->writeln("echo 'action:strict'");
+$pureftpd_tls->writeln('case "$CERTD_SNI_NAME" in');
 
-$dovecot_tls->write("ssl_cert = <$fqdn_fullchain_file\n");
-$dovecot_tls->write("ssl_key = <$fqdn_key_file\n");
+$dovecot_tls->writeln("ssl_cert = <$fqdn_fullchain_file");
+$dovecot_tls->writeln("ssl_key = <$fqdn_key_file");
 
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
@@ -81,28 +81,28 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     }
 
     foreach ($domains as $domain) {
-        $postfix_map->write($domain . ' ' . $key_file . ' ' . $fullchain_file . "\n");
+        $postfix_map->writeln($domain . ' ' . $key_file . ' ' . $fullchain_file);
 
-        $dovecot_tls->write('local_name ' . $domain . " {\n");
-        $dovecot_tls->write("  ssl_cert = <$fullchain_file\n");
-        $dovecot_tls->write("  ssl_key = <$key_file\n");
-        $dovecot_tls->write("}\n");
+        $dovecot_tls->writeln('local_name ' . $domain . " {");
+        $dovecot_tls->writeln("  ssl_cert = <$fullchain_file");
+        $dovecot_tls->writeln("  ssl_key = <$key_file");
+        $dovecot_tls->writeln("}");
     }
 
-    $pureftpd_tls->write("  '" . implode("'|'", $domains) . "')\n");
-    $pureftpd_tls->write("    echo 'cert_file:$fullchain_file'\n");
-    $pureftpd_tls->write("    echo 'key_file:$key_file'\n");
-    $pureftpd_tls->write("    ;;\n");
+    $pureftpd_tls->writeln("  '" . implode("'|'", $domains) . "')");
+    $pureftpd_tls->writeln("    echo 'cert_file:$fullchain_file'");
+    $pureftpd_tls->writeln("    echo 'key_file:$key_file'");
+    $pureftpd_tls->writeln("    ;;");
 }
 
 unset($cert_row, $cert_res, $domain_raw, $fullchain_file, $key_file, $cert_data, $domains);
 
-$pureftpd_tls->write("  *)\n");
-$pureftpd_tls->write("    echo 'cert_file:" . $fqdn_fullchain_file . "'\n");
-$pureftpd_tls->write("    echo 'key_file:" . $fqdn_key_file . "'\n");
-$pureftpd_tls->write("    ;;\n");
-$pureftpd_tls->write("esac\n");
-$pureftpd_tls->write("echo 'end'\n");
+$pureftpd_tls->writeln("  *)");
+$pureftpd_tls->writeln("    echo 'cert_file:" . $fqdn_fullchain_file . "'");
+$pureftpd_tls->writeln("    echo 'key_file:" . $fqdn_key_file . "'");
+$pureftpd_tls->writeln("    ;;");
+$pureftpd_tls->writeln("esac");
+$pureftpd_tls->writeln("echo 'end'");
 
 $postfix_map->close();
 $dovecot_tls->close();

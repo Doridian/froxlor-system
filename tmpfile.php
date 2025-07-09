@@ -22,6 +22,10 @@ class SafeTempFile {
         }
     }
 
+    public function writeln($data) {
+        $this->write($data . "\n");
+    }
+
     public function close() {
         fclose($this->fh);
         if (!rename($this->tmpname, $this->name)) {
