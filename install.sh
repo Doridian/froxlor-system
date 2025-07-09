@@ -9,8 +9,6 @@ export INSTALLDIR="$(pwd)"
 #echo 'Ensuring all LetsEncrypt certificates are present...'
 #./build_cmd.py | sh -x
 
-./update.sh
-
 echo 'Rendering system configuration files...'
 rm -rf build && mkdir -p build
 
@@ -29,6 +27,5 @@ postconf "smtpd_tls_chain_files=/etc/ssl/froxlor-custom/${FQDN}.key,/etc/ssl/fro
 
 postconf 'tls_server_sni_maps=hash:/etc/postfix/tls_server_sni_maps'
 
-echo 'Restarting services...'
-./renew.sh
-systemctl restart cron
+echo 'Running update...'
+./update.sh
