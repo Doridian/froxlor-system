@@ -56,8 +56,6 @@ while ($cert_row = $cert_res->fetch_assoc()) {
         continue;
     }
 
-    print_r($cert_data);
-
     if (!empty($cert_data['subject']['CN'])) {
         $domains[] = $cert_data['subject']['CN'];
     }
