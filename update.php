@@ -99,7 +99,7 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     }
 
     foreach ($domains as $domain) {
-        $postfix_map->writeln($domain . ' ' . $key_file . ' ' . $fullchain_file);
+        $postfix_map->writeln($domain . ' ' . escapeshellarg($key_file) . ' ' . escapeshellarg($fullchain_file));
 
         $dovecot_tls->writeln('local_name ' . $domain . ' {');
         $dovecot_tls->writeln("  ssl_cert = <$fullchain_file");
