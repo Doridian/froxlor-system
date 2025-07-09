@@ -4,4 +4,3 @@ dbname = ${FROXLOR_DB_NAME}
 expansion_limit = 1
 hosts = ${FROXLOR_DB_HOST}
 query = SELECT REPLACE(TO_BASE64(CONCAT(ssl_key_file, ssl_fullchain_file)),"\n","") FROM domain_ssl_settings s, panel_domains d WHERE d.id = s.domainid AND (d.domain = '%s' OR (d.wwwserveralias = 1 AND d.domain = TRIM(LEADING "www." FROM '%s')))
-mysql-tls_server_sni_maps.cf
