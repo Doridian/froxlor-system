@@ -84,7 +84,7 @@ abstract class TLSWriter {
         }
     }
 
-    protected abstract function writeHeader(): void {
+    protected function writeHeader(): void {
         // Default implementation does nothing
     }
     protected function writeConfig(TLSConfig $config): void {
@@ -92,7 +92,7 @@ abstract class TLSWriter {
             $this->writeConfigDomain($config, $domain);
         }
     }
-    protected abstract function writeConfigDomain(TLSConfig $config, string $domain): void {
+    protected function writeConfigDomain(TLSConfig $config, string $domain): void {
         throw new BadMethodCallException("writeConfigDomain must be implemented in subclass");
     }
     protected function writeFooter(): void { 
