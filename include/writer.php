@@ -115,6 +115,12 @@ abstract class TLSWriter {
         $this->postSave();
     }
 
+    public function remove(): void {
+        $this->file->remove();
+        $this->configs = [];
+        $this->default_config = null;
+    }
+
     public function postSave(): void {
         // Default implementation does nothing
         // Subclasses can override this method to perform additional actions after saving
