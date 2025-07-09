@@ -21,7 +21,7 @@ $ips_str = implode(' ', $ips);
 $postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
 chmod('/etc/postfix/tls_server_sni_maps', 0640);
 $dovecot_tls_fh = fopen('/etc/dovecot/conf.d/zzz-2-tls-sni.conf', 'w');
-$proftpd_tls_fh = fopen('/etc/proftpd/conf.d/tls_sni.conf', 'w');
+$proftpd_tls_fh = fopen('/etc/proftpd/conf.d/tls-sni.conf', 'w');
 
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
