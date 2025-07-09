@@ -2,9 +2,9 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-export FQDN="$(hostname -f)"
 export INSTALLDIR="$(pwd)"
 export SSLDIR="$(php -r 'require_once "shared.php"; echo $ssl_dir;')"
+export FQDN="$(php -r 'require_once "shared.php"; echo $fqdn;')"
 
 set -x
 
