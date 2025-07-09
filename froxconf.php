@@ -24,8 +24,8 @@ function add_domain($domain, $key_file, $fullchain_file) {
     fwrite($postfix_map_fh, $domain . ' ' . $key_file . ' ' . $fullchain_file . "\n");
 
     fwrite($dovecot_tls_fh, 'local_name ' . $domain . " {\n");
-    fwrite($dovecot_tls_fh, "  ssl_server_cert_file = $fullchain_file\n");
-    fwrite($dovecot_tls_fh, "  ssl_server_key_file = $key_file\n");
+    fwrite($dovecot_tls_fh, "  ssl_cert = <$fullchain_file\n");
+    fwrite($dovecot_tls_fh, "  ssl_key = <$key_file\n");
     fwrite($dovecot_tls_fh, "}\n");
 }
 
