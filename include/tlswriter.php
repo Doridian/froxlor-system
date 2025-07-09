@@ -58,7 +58,7 @@ abstract class TLSWriter implements ITLSWriter {
         $fh = new SafeTempFile($this->file, $this->mode);
         $this->writeHeader($fh);
         foreach ($this->configs as $config) {
-            if (!$this->write_default && $config->isDefault()) {
+            if (!$this->write_default && $config === $this->default_config) {
                 continue;
             }
             $this->writeConfig($fh, $config);
