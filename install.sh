@@ -3,7 +3,6 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 export FQDN="$(hostname -f)"
-
 export INSTALLDIR="$(pwd)"
 
 echo 'Rendering system configuration files...'
@@ -15,6 +14,8 @@ find etc -type f -exec /bin/sh -c 'envsubst < "$1" > "build/$1"' -- {} \;
 cp -rv build/etc/* /etc/
 
 rm -rf build
+
+set -x
 
 echo 'Adjusting postfix configuration...'
 postconf "smtpd_tls_cert_file=/etc/ssl/froxlor-custom/${FQDN}.crt"
