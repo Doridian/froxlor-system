@@ -11,8 +11,6 @@ $db = new mysqli(
     $sql['db'],
 ) or die('Database connection error '. mysqli_connect_error());
 
-$cert_res = $db->query("SELECT domain, wwwserveralias FROM panel_domains;");
-
 $ips_res = $db->query("SELECT DISTINCT ip FROM panel_ipsandports;");
 $ips = [];
 while ($ip_row = $ips_res->fetch_assoc()) {
@@ -44,6 +42,7 @@ function add_domain($domain, $key_file, $fullchain_file, $cert_file, $chain_file
     fwrite($proftpd_tls_fh, "</VirtualHost>\n");
 }
 
+$cert_res = $db->query("SELECT domain, wwwserveralias FROM panel_domains;");
 while ($cert_row = $cert_res->fetch_assoc()) {
     $domain = $cert_row['domain'];
 
