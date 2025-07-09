@@ -8,7 +8,7 @@ define('SSL_DIR', '/etc/ssl/froxlor-custom/');
 
 require_once '/var/www/html/froxlor/lib/userdata.inc.php';
 
-$fqdn = trim(shell_exec('hostname -f'));
+$fqdn = strtolower(trim(shell_exec('hostname -f')));
 
 $db = new mysqli(
     $sql['host'],
