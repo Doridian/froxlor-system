@@ -5,14 +5,17 @@ require_once 'shared.php';
 
 $fqdn = strtolower(trim(get_setting('system', 'hostname')));
 
-function fullchain_from_domain($domain) {
+function sslfile_from_domain($domain, $suffix) {
     global $ssl_dir;
-    return $ssl_dir . $domain . '_fullchain.pem';
+    return $ssl_dir . $domain . $suffix;
+}
+
+function fullchain_from_domain($domain) {
+    return sslfile_from_domain($domain, '_fullchain.pem');
 }
 
 function key_from_domain($domain) {
-    global $ssl_dir;
-    return $ssl_dir . $domain . '.key';
+    return sslfile_from_domain($domain, '.key');
 }
 
 function verbose_run($command) {
@@ -139,9 +142,9 @@ function postconf($values) {
 }
 
 postconf([
-    'smtpd_tls_cert_file' => $ssl_dir . $fqdn . '.crt',
+    'smtpd_tls_cert_file' => sslfile_from_domain($fqdn, '.crt'),
     'smtpd_tls_key_file' => $fqdn_key_file,
-    'smtpd_tls_CAfile' => $ssl_dir . $fqdn . '_chain.pem',
+    'smtpd_tls_CAfile' => sslfile_from_domain($fqdn, '_chain.pem'),
     'smtpd_tls_chain_files' => $fqdn_key_file . ',' . $fqdn_fullchain_file,
     'tls_server_sni_maps' => 'hash:/etc/postfix/tls_server_sni_maps',
 ]);
