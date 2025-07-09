@@ -2,7 +2,7 @@
 
 require_once 'writer.php';
 
-class PostfixWriter implements TLSWriter {
+class PostfixWriter extends TLSWriter {
     private $file;
 
     public function __construct() {

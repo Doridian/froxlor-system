@@ -2,7 +2,7 @@
 
 require_once 'writer.php';
 
-class PureFTPDWriter implements TLSWriter {
+class PureFTPDWriter extends TLSWriter {
     private $file;
 
     public function __construct() {
