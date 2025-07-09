@@ -5,7 +5,6 @@ set -x
 cd "$(dirname "$0")"
 
 export INSTALLDIR="$(pwd)"
-export SSLDIR="$(php -r 'require_once "shared.php"; echo $ssl_dir;')"
 
 echo 'Rendering system configuration files...'
 rm -rf build && mkdir -p build
