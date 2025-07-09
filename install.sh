@@ -28,4 +28,5 @@ postconf "smtpd_tls_chain_files=/etc/ssl/froxlor-custom/${FQDN}.key,/etc/ssl/fro
 postconf 'tls_server_sni_maps=hash:/etc/postfix/tls_server_sni_maps'
 
 echo 'Running update...'
+systemctl restart cron
 ./update.sh
