@@ -29,9 +29,9 @@ while ($cert_row = $cert_res->fetch_assoc()) {
         continue;
     }
 
-    fwrite($postfix_map_fh, $domain . ' ' . $fullchain_file . ' ' . $key_file . "\n");
+    fwrite($postfix_map_fh, $domain . ' ' . $key_file . ' ' . $fullchain_file . "\n");
     if ($cert_row['wwwserveralias']) {
-        fwrite($postfix_map_fh, 'www.' . $domain . ' ' . $fullchain_file . ' ' . $key_file . "\n");
+        fwrite($postfix_map_fh, 'www.' . $domain . ' ' . $key_file . ' ' . $fullchain_file . "\n");
     }
 }
 
