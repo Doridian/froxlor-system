@@ -15,6 +15,11 @@ function key_from_domain($domain) {
     return $ssl_dir . $domain . '.key';
 }
 
+function verbose_run($command) {
+    echo "Running: $command\n";
+    passthru($command);
+}
+
 $postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
 chmod('/etc/postfix/tls_server_sni_maps', 0640);
 
@@ -119,21 +124,27 @@ fclose($postfix_map_fh);
 fclose($dovecot_tls_fh);
 fclose($pureftpd_tls_fh);
 
-passthru('postmap -F /etc/postfix/tls_server_sni_maps');
+verbose_run('postmap -F /etc/postfix/tls_server_sni_maps');
 chmod('/etc/postfix/tls_server_sni_maps.db', 0640);
 chgrp('/etc/postfix/tls_server_sni_maps.db', 'postfix');
 
-function postconf($key, $value) {
-    $key = escapeshellarg($key);
-    $escaped_value = escapeshellarg($value);
-    passthru("postconf '$key=$escaped_value'");
+function postconf($values) {
+    $args = [];
+    foreach ($values as $key => $value) {
+        $key = escapeshellarg($key);
+        $escaped_value = escapeshellarg($value);
+        $args[] = "'$key=$escaped_value'";
+    }
+    verbose_run("postconf " . implode(' ', $args));
 }
 
-postconf('smtpd_tls_cert_file', $ssl_dir . $domain . '.crt');
-postconf('smtpd_tls_key_file', $fqdn_key_file);
-postconf('smtpd_tls_CAfile', $ssl_dir . $domain . '_chain.pem');
-postconf('smtpd_tls_chain_files', $fqdn_key_file . ',' . $fqdn_fullchain_file);
-postconf('tls_server_sni_maps', 'hash:/etc/postfix/tls_server_sni_maps');
+postconf([
+    'smtpd_tls_cert_file' => $ssl_dir . $domain . '.crt',
+    'smtpd_tls_key_file' => $fqdn_key_file,
+    'smtpd_tls_CAfile' => $ssl_dir . $domain . '_chain.pem',
+    'smtpd_tls_chain_files' => $fqdn_key_file . ',' . $fqdn_fullchain_file,
+    'tls_server_sni_maps' => 'hash:/etc/postfix/tls_server_sni_maps',
+]);
 
-passthru('systemctl restart dovecot');
-passthru('systemctl restart postfix');
+verbose_run('systemctl restart dovecot');
+verbose_run('systemctl restart postfix');
