@@ -17,6 +17,9 @@ class SafeTempFile {
     }
 
     public function write($data) {
+        if (empty($this->fh)) {
+            throw new Exception("File not opened: $this->tmpname");
+        }
         if (fwrite($this->fh, $data) === false) {
             throw new Exception("Could not write to temporary file: $this->tmpname");
         }
@@ -27,7 +30,11 @@ class SafeTempFile {
     }
 
     public function close() {
+        if (empty($this->fh)) {
+            return;
+        }
         fclose($this->fh);
+        unset($this->fh);
         if (!rename($this->tmpname, $this->name)) {
             throw new Exception("Could not rename temporary file to final name: $this->name");
         }
