@@ -29,7 +29,7 @@ $pureftpd_tls_fh = fopen('/etc/pure-ftpd/certd.sh', 'w');
 fwrite($pureftpd_tls_fh, "#!/bin/bash\n");
 fwrite($pureftpd_tls_fh, "set -euo pipefail\n");
 chmod('/etc/pure-ftpd/certd.sh', 0755);
-fwrite($pureftpd_tls_fh, "case \"$CERTD_SNI_NAME\" in\n");
+fwrite($pureftpd_tls_fh, 'case "$CERTD_SNI_NAME" in\n');
 
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
@@ -80,8 +80,6 @@ while ($cert_row = $cert_res->fetch_assoc()) {
         continue;
     }
 
-    $domains_str = implode(' ', $domains);
-
     foreach ($domains as $domain) {
         fwrite($postfix_map_fh, $domain . ' ' . $key_file . ' ' . $fullchain_file . "\n");
 
@@ -91,9 +89,7 @@ while ($cert_row = $cert_res->fetch_assoc()) {
         fwrite($dovecot_tls_fh, "}\n");
     }
 
-    foreach ($domains as $domain) {
-        fwrite($pureftpd_tls_fh, "  $domain)\n");
-    }
+    $domains_str = fwrite($pureftpd_tls_fh, '  ' . implode('|', $domains) . ")\n");
     fwrite($pureftpd_tls_fh, "    echo 'cert_file:$fullchain_file'\n");
     fwrite($pureftpd_tls_fh, "    echo 'key_file:$key_file'\n");
     fwrite($pureftpd_tls_fh, "    ;;\n");
