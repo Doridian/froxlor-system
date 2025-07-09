@@ -22,6 +22,7 @@ $postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
 chmod('/etc/postfix/tls_server_sni_maps', 0640);
 $dovecot_tls_fh = fopen('/etc/dovecot/conf.d/zzz-2-tls-sni.conf', 'w');
 $proftpd_tls_fh = fopen('/etc/proftpd/conf.d/tls-sni.conf', 'w');
+fwrite($proftpd_tls_fh, "<IfModule mod_tls.c>\n");
 
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
@@ -55,6 +56,8 @@ while ($cert_row = $cert_res->fetch_assoc()) {
         echo "Skipping $domain_raw, cert data could not be parsed\n";
         continue;
     }
+
+    print_r($cert_data);
 
     if (!empty($cert_data['subject']['CN'])) {
         $domains[] = $cert_data['subject']['CN'];
@@ -100,8 +103,11 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     fwrite($proftpd_tls_fh, "</VirtualHost>\n");
 }
 
+fwrite($proftpd_tls_fh, "</IfModule>\n");
+
 fclose($postfix_map_fh);
 fclose($dovecot_tls_fh);
+fclose($proftpd_tls_fh);
 
 passthru('postmap -F /etc/postfix/tls_server_sni_maps');
 chmod('/etc/postfix/tls_server_sni_maps.db', 0640);
