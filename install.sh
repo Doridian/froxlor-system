@@ -34,4 +34,5 @@ echo 'Running update...'
 systemctl daemon-reload
 systemctl restart cron
 systemctl enable --now pure-certd
+systemctl restart pure-certd
 ./update.sh
