@@ -2,8 +2,12 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-export CERTDIR="/etc/letsencrypt/live/$(hostname -f)"
+export FQDN="$(hostname -f)"
+
+export CERTDIR="/etc/letsencrypt/live/${FQDN}"
 export INSTALLDIR="$(pwd)"
+
+eval "$(php froxconf.php)"
 
 echo 'Ensuring all LetsEncrypt certificates are present...'
 ./build_cmd.py | sh -x
@@ -19,9 +23,11 @@ cp -rv build/etc/* /etc/
 rm -rf build
 
 echo 'Adjusting postfix configuration...'
-postconf "smtpd_tls_cert_file=$CERTDIR/cert.pem"
-postconf "smtpd_tls_key_file=$CERTDIR/privkey.pem"
-postconf "smtpd_tls_CAfile=$CERTDIR/chain.pem"
+postconf "smtpd_tls_cert_file=/etc/ssl/froxlor-custom/${FQDN}.crt"
+postconf "smtpd_tls_key_file=/etc/ssl/froxlor-custom/${FQDN}.key"
+postconf "smtpd_tls_CAfile=/etc/ssl/froxlor-custom/${FQDN}_chain.pem"
+
+postconf 'tls_server_sni_maps=proxy:mysql:/etc/postfix/mysql-tls_server_sni_maps.cf'
 
 echo 'Restarting services...'
 ./renew.sh
