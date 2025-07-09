@@ -16,7 +16,7 @@ class PureFTPDWriter extends TLSWriter {
 
     protected function writeFooter(SafeTempFile $fh): void {
         if (!empty($this->default_config)) {
-            $this->writeConfigInternal($this->default_config, '*');
+            $this->writeConfigInternal($fh, $this->default_config, '*');
         }
         $fh->writeln('esac');
         $fh->writeln("echo 'end'");
