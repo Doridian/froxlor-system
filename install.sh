@@ -15,6 +15,11 @@ find etc -type f -exec /bin/sh -c 'envsubst < "$1" > "build/$1"' -- {} \;
 
 cp -rv build/etc/* /etc/
 
+if ! grep -qF ExtCert /usr/sbin/pure-ftpd-wrapper; then
+    echo 'Adding ExtCert to pure-ftpd-wrappers...'
+    patch -i pure-ftpd-wrapper.patch /usr/sbin/pure-ftpd-wrapper
+fi
+
 rm -rf build
 
 echo 'Adjusting postfix configuration...'
