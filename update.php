@@ -67,8 +67,8 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     if (isset($cert_data['extensions']['subjectAltName']) && !empty($cert_data['extensions']['subjectAltName'])) {
         $san_array = explode(',', $cert_data['extensions']['subjectAltName']);
         foreach ($san_array as $san) {
-            $san = trim($san);
-            if (strpos($san, 'DNS:') !== 0) {
+            $san = strtolower(trim($san));
+            if (strpos($san, 'dns:') !== 0) {
                 continue;
             }
             $san = substr($san, 4); // Remove 'DNS:' prefix
