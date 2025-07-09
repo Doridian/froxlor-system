@@ -147,5 +147,5 @@ postconf([
     'tls_server_sni_maps' => 'hash:/etc/postfix/tls_server_sni_maps',
 ]);
 
-verbose_run('systemctl restart dovecot');
-verbose_run('systemctl restart postfix');
+verbose_run('systemctl reload dovecot');
+verbose_run('systemctl reload postfix');
