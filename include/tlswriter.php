@@ -4,6 +4,8 @@ require_once 'shared.php';
 require_once 'tmpfile.php';
 require_once 'tlsconfig.php';
 
+// TODO: We really only want one set of TLSConfig, they will all be the same...
+
 interface ITLSWriter {
     public function add(array $domains, string $fullchain_file, string $key_file): void;
     public function setDefault(array $domains, string $fullchain_file, string $key_file): void;
