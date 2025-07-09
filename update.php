@@ -103,9 +103,9 @@ $pureftpd_tls->writeln("    ;;");
 $pureftpd_tls->writeln("esac");
 $pureftpd_tls->writeln("echo 'end'");
 
-$postfix_map->close();
-$dovecot_tls->close();
-$pureftpd_tls->close();
+$postfix_map->save();
+$dovecot_tls->save();
+$pureftpd_tls->save();
 
 verbose_run('postmap -F /etc/postfix/tls_server_sni_maps');
 chmod('/etc/postfix/tls_server_sni_maps.db', 0640);

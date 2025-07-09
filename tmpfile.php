@@ -42,7 +42,7 @@ class SafeTempFile {
         return true;
     }
 
-    public function close() {
+    public function save() {
         if (!$this->closefh()) {
             return;
         }
