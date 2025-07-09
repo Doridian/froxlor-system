@@ -6,12 +6,17 @@ ini_set('display_errors', '1');
 
 require_once '/var/www/html/froxlor/lib/userdata.inc.php';
 
+function die_error($message) {
+    echo "Error: $message\n";
+    exit(1);
+}
+
 $db = new mysqli(
     $sql['host'],
     $sql['user'],
     $sql['password'],
     $sql['db'],
-) or die('Database connection error '. mysqli_connect_error());
+) or die_error('Database connection error '. mysqli_connect_error());
 
 function get_setting($group, $name) {
     global $db;
@@ -20,13 +25,15 @@ function get_setting($group, $name) {
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result->num_rows === 0) {
-        die("Setting $group.$name not found in panel_settings, please set it in the Froxlor settings.");
+        die_error("Setting $group.$name not found in panel_settings, please set it in the Froxlor settings.");
     }
     $row = $result->fetch_assoc();
     $value = $row['value'];
     if (empty($value)) {
-        die("Setting $group.$name is empty, please set it in the Froxlor settings.");
+        die_error("Setting $group.$name is empty, please set it in the Froxlor settings.");
     }
     $stmt->close();
     return $value;
 }
+
+$ssl_dir = rtrim(get_setting('system', 'customer_ssl_path'), '/') . '/';

@@ -3,8 +3,6 @@
 
 require_once 'shared.php';
 
-$ssl_dir = rtrim(get_setting('system', 'customer_ssl_path'), '/') . '/';
-
 $fqdn = strtolower(trim(shell_exec('hostname -f')));
 
 $ips_res = $db->query('SELECT DISTINCT ip FROM panel_ipsandports;');

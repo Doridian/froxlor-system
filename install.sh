@@ -4,6 +4,7 @@ cd "$(dirname "$0")"
 
 export FQDN="$(hostname -f)"
 export INSTALLDIR="$(pwd)"
+export SSLDIR="$(php -r 'require_once "shared.php"; echo $ssl_dir;')"
 
 set -x
 
@@ -23,10 +24,10 @@ fi
 rm -rf build
 
 echo 'Adjusting postfix configuration...'
-postconf "smtpd_tls_cert_file=/etc/ssl/froxlor-custom/${FQDN}.crt"
-postconf "smtpd_tls_key_file=/etc/ssl/froxlor-custom/${FQDN}.key"
-postconf "smtpd_tls_CAfile=/etc/ssl/froxlor-custom/${FQDN}_chain.pem"
-postconf "smtpd_tls_chain_files=/etc/ssl/froxlor-custom/${FQDN}.key,/etc/ssl/froxlor-custom/${FQDN}_fullchain.pem"
+postconf "smtpd_tls_cert_file=${SSLDIR}${FQDN}.crt"
+postconf "smtpd_tls_key_file=${SSLDIR}${FQDN}.key"
+postconf "smtpd_tls_CAfile=${SSLDIR}${FQDN}_chain.pem"
+postconf "smtpd_tls_chain_files=${SSLDIR}${FQDN}.key,${SSLDIR}${FQDN}_fullchain.pem"
 
 postconf 'tls_server_sni_maps=hash:/etc/postfix/tls_server_sni_maps'
 
