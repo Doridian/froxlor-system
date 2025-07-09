@@ -13,14 +13,25 @@ $db = new mysqli(
 
 $cert_res = $db->query("SELECT domain, wwwserveralias FROM panel_domains;");
 
+$postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
+
 while ($cert_row = $cert_res->fetch_assoc()) {
-    $fullchain_file = SSL_DIR . '/' . $cert_row['domain'] . '_fullchain.pem';
+    $domain = $cert_row['domain'];
+
+    $fullchain_file = SSL_DIR . '/' . $domain . '_fullchain.pem';
     if (!file_exists($fullchain_file)) {
         continue;
     }
 
-    $key_file = SSL_DIR . '/' . $cert_row['domain'] . '.key';
+    $key_file = SSL_DIR . '/' . $domain . '.key';
     if (!file_exists($key_file)) {
         continue;
     }
+
+    fwrite($postfix_map_fh, $domain . ' ' . $fullchain_file . ' ' . $key_file . "\n");
+    if ($cert_row['wwwserveralias']) {
+        fwrite($postfix_map_fh, 'www.' . $domain . ' ' . $fullchain_file . ' ' . $key_file . "\n");
+    }
 }
+
+fclose($postfix_map_fh);
