@@ -65,6 +65,7 @@ abstract class TLSWriter {
 
     protected function __construct($file, $mode = 0644, $write_default = false) {
         $this->configs = [];
+        $this->default_config = null;
         $this->file = new SafeTempFile($file, $mode);
         $this->write_default = $write_default;
     }
