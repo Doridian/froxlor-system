@@ -1,8 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-require_once 'shared.php';
-require_once 'tmpfile.php';
+require_once 'include/shared.php';
+require_once 'include/tmpfile.php';
 
 // TODO: Detect if certificates were updated since last run
 //       and only update if they were changed.
