@@ -75,8 +75,10 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     }
 
     $domains = array_unique($domains);
-
-    print_r($domains);
+    if (empty($domains)) {
+        echo "Skipping $domain_raw, no valid domains found in cert\n";
+        continue;
+    }
 
     $domains_str = implode(' ', $domains);
 
