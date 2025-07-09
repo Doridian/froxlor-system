@@ -7,11 +7,11 @@ class PostfixWriter extends TLSWriter {
         parent::__construct('/etc/postfix/tls_server_sni_maps', 0640);
     }
 
-    public function writeConfigDomain(SafeTempFile $fh, TLSConfig $config, string $domain): void {
+    protected function writeConfigDomain(SafeTempFile $fh, TLSConfig $config, string $domain): void {
         $fh->writeln($domain . ' ' . $config->key_file . ' ' . $config->fullchain_file);
     }
 
-    public function postSave(): void {
+    protected function postSave(): void {
         verbose_run('postmap -F /etc/postfix/tls_server_sni_maps');
         chmod('/etc/postfix/tls_server_sni_maps.db', 0640);
         chgrp('/etc/postfix/tls_server_sni_maps.db', 'postfix');

@@ -21,7 +21,7 @@ class DovecotWriter extends TLSWriter {
         $fh->writeln('}');
     }
 
-    public function postSave(): void {
+    protected function postSave(): void {
         verbose_run('systemctl reload dovecot');
     }
 }

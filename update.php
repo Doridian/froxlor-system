@@ -6,13 +6,18 @@ require_once 'include/shared.php';
 require_once 'include/postfix.php';
 require_once 'include/dovecot.php';
 require_once 'include/pureftpd.php';
+require_once 'include/multiwriter.php';
 
 // TODO: Detect if certificates were updated since last run
 //       and only update if they were changed.
 
-$postfix_map = new PostfixWriter();
-$dovecot_tls = new DovecotWriter();
-$pureftpd_tls = new PureFTPDWriter();
+$writer = new MultiTLSWriter([
+    new PostfixWriter(),
+    new DovecotWriter(),
+    new PureFTPDWriter(),
+]);
+
+$writer->add(['*'], $fqdn_fullchain_file, $fqdn_key_file);
 
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
@@ -72,15 +77,7 @@ while ($cert_row = $cert_res->fetch_assoc()) {
         continue;
     }
 
-    $postfix_map->add($domains, $fullchain_file, $key_file);
-    $dovecot_tls->add($domains, $fullchain_file, $key_file);
-    $pureftpd_tls->add($domains, $fullchain_file, $key_file);
+    $writer->add($domains, $fullchain_file, $key_file);
 }
 
-$postfix_map->add(['*'], $fqdn_fullchain_file, $fqdn_key_file);
-$dovecot_tls->add(['*'], $fqdn_fullchain_file, $fqdn_key_file);
-$pureftpd_tls->add(['*'], $fqdn_fullchain_file, $fqdn_key_file);
-
-$postfix_map->save();
-$dovecot_tls->save();
-$pureftpd_tls->save();
+$writer->save();

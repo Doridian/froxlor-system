@@ -4,7 +4,12 @@ require_once 'shared.php';
 require_once 'tmpfile.php';
 require_once 'tlsconfig.php';
 
-abstract class TLSWriter {
+interface ITLSWriter {
+    public function add(array $domains, string $fullchain_file, string $key_file): void;
+    public function save(): void;
+}
+
+abstract class TLSWriter implements ITLSWriter {
     protected array $configs;
     protected ?TLSConfig $default_config;
     protected readonly string $file;
@@ -64,7 +69,7 @@ abstract class TLSWriter {
         $this->postSave();
     }
 
-    public function postSave(): void {
+    protected function postSave(): void {
         // Default implementation does nothing
         // Subclasses can override this method to perform additional actions after saving
     }
