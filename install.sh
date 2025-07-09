@@ -4,13 +4,12 @@ cd "$(dirname "$0")"
 
 export FQDN="$(hostname -f)"
 
-export CERTDIR="/etc/letsencrypt/live/${FQDN}"
 export INSTALLDIR="$(pwd)"
 
-eval "$(php froxconf.php)"
+#echo 'Ensuring all LetsEncrypt certificates are present...'
+#./build_cmd.py | sh -x
 
-echo 'Ensuring all LetsEncrypt certificates are present...'
-./build_cmd.py | sh -x
+./update.sh
 
 echo 'Rendering system configuration files...'
 rm -rf build && mkdir -p build
@@ -26,8 +25,9 @@ echo 'Adjusting postfix configuration...'
 postconf "smtpd_tls_cert_file=/etc/ssl/froxlor-custom/${FQDN}.crt"
 postconf "smtpd_tls_key_file=/etc/ssl/froxlor-custom/${FQDN}.key"
 postconf "smtpd_tls_CAfile=/etc/ssl/froxlor-custom/${FQDN}_chain.pem"
+postconf "smtpd_tls_chain_files=/etc/ssl/froxlor-custom/${FQDN}.key,/etc/ssl/froxlor-custom/${FQDN}_fullchain.pem"
 
-postconf 'tls_server_sni_maps=proxy:mysql:/etc/postfix/mysql-tls_server_sni_maps.cf'
+postconf 'tls_server_sni_maps=hash:/etc/postfix/tls_server_sni_maps'
 
 echo 'Restarting services...'
 ./renew.sh
