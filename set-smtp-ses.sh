@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+set -x
 
 # /etc/postfix/sasl_passwd should contain the following line:
 # [email-smtp.eu-west-1.amazonaws.com]:587 ACCESS_KEY:SECRET_KEY

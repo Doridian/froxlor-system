@@ -1,11 +1,11 @@
 #!/bin/bash
 set -euo pipefail
+set -x
+
 cd "$(dirname "$0")"
 
 export INSTALLDIR="$(pwd)"
 export SSLDIR="$(php -r 'require_once "shared.php"; echo $ssl_dir;')"
-
-set -x
 
 echo 'Rendering system configuration files...'
 rm -rf build && mkdir -p build
