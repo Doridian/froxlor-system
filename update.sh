@@ -8,4 +8,4 @@ php froxconf.php
 
 systemctl restart dovecot
 systemctl restart postfix
-systemctl restart proftpd
+systemctl restart pure-ftpd
