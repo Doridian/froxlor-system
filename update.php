@@ -11,8 +11,8 @@ $postfix_map = new SafeTempFile('/etc/postfix/tls_server_sni_maps', 0640);
 $dovecot_tls = new SafeTempFile('/etc/dovecot/conf.d/zzz-tls-sni.conf');
 
 $pureftpd_tls = new SafeTempFile('/etc/pure-ftpd/certd.sh', 0755);
-$pureftpd_tls->writeln("#!/bin/bash");
-$pureftpd_tls->writeln("set -euo pipefail");
+$pureftpd_tls->writeln('#!/bin/bash');
+$pureftpd_tls->writeln('set -euo pipefail');
 
 $pureftpd_tls->writeln("echo 'action:strict'");
 $pureftpd_tls->writeln('case "$CERTD_SNI_NAME" in');
@@ -82,25 +82,25 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     foreach ($domains as $domain) {
         $postfix_map->writeln($domain . ' ' . $key_file . ' ' . $fullchain_file);
 
-        $dovecot_tls->writeln('local_name ' . $domain . " {");
+        $dovecot_tls->writeln('local_name ' . $domain . ' {');
         $dovecot_tls->writeln("  ssl_cert = <$fullchain_file");
         $dovecot_tls->writeln("  ssl_key = <$key_file");
-        $dovecot_tls->writeln("}");
+        $dovecot_tls->writeln('}');
     }
 
     $pureftpd_tls->writeln("  '" . implode("'|'", $domains) . "')");
     $pureftpd_tls->writeln("    echo 'cert_file:$fullchain_file'");
     $pureftpd_tls->writeln("    echo 'key_file:$key_file'");
-    $pureftpd_tls->writeln("    ;;");
+    $pureftpd_tls->writeln('    ;;');
 }
 
 unset($cert_row, $cert_res, $domain_raw, $fullchain_file, $key_file, $cert_data, $domains);
 
-$pureftpd_tls->writeln("  *)");
+$pureftpd_tls->writeln('  *)');
 $pureftpd_tls->writeln("    echo 'cert_file:" . $fqdn_fullchain_file . "'");
 $pureftpd_tls->writeln("    echo 'key_file:" . $fqdn_key_file . "'");
 $pureftpd_tls->writeln("    ;;");
-$pureftpd_tls->writeln("esac");
+$pureftpd_tls->writeln('esac');
 $pureftpd_tls->writeln("echo 'end'");
 
 $postfix_map->save();
@@ -116,7 +116,7 @@ function postconf($values) {
     foreach ($values as $key => $value) {
         $args[] = escapeshellarg("$key=$value");
     }
-    verbose_run("postconf " . implode(' ', $args));
+    verbose_run('postconf ' . implode(' ', $args));
 }
 
 postconf([
