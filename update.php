@@ -109,4 +109,3 @@ chgrp('/etc/postfix/tls_server_sni_maps.db', 'postfix');
 
 passthru('systemctl restart dovecot');
 passthru('systemctl restart postfix');
-passthru('systemctl restart pure-ftpd-mysql');
