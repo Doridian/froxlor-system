@@ -7,34 +7,34 @@ class PureFTPDWriter extends TLSWriter {
         parent::__construct('/etc/pure-ftpd/certd.sh', 0755);
     }
 
-    protected function writeHeader(): void {
-        $this->file->writeln('#!/bin/bash');
-        $this->file->writeln('set -euo pipefail');
-        $this->file->writeln("echo 'action:strict'");
-        $this->file->writeln('case "$CERTD_SNI_NAME" in');
+    protected function writeHeader(SafeTempFile $fh): void {
+        $fh->writeln('#!/bin/bash');
+        $fh->writeln('set -euo pipefail');
+        $fh->writeln("echo 'action:strict'");
+        $fh->writeln('case "$CERTD_SNI_NAME" in');
     }
 
-    protected function writeFooter(): void {
+    protected function writeFooter(SafeTempFile $fh): void {
         if (!empty($this->default_config)) {
             $this->writeConfigInternal($this->default_config, '*');
         }
-        $this->file->writeln('esac');
-        $this->file->writeln("echo 'end'");
+        $fh->writeln('esac');
+        $fh->writeln("echo 'end'");
     }
 
-    protected function writeConfig(TLSConfig $config): void {
+    protected function writeConfig(SafeTempFile $fh, TLSConfig $config): void {
         $domains_str = implode('|', array_map('escapeshellarg', $config->getDomains()));
-        $this->writeConfigInternal($config, $domains_str);
+        $this->writeConfigInternal($fh, $config, $domains_str);
     }
 
-    private function writeConfigInternal(TLSconfig $config, string $domains_str): void {
+    private function writeConfigInternal(SafeTempFile $fh, TLSConfig $config, string $domains_str): void {
         $fullchain_escaped = escapeshellarg("cert_file:{$config->fullchain_file}");
         $key_escaped = escapeshellarg("key_file:{$config->key_file}");
 
-        $this->file->writeln("  $domains_str)");
-        $this->file->writeln("    echo $fullchain_escaped");
-        $this->file->writeln("    echo $key_escaped");
-        $this->file->writeln('    ;;');
+        $fh->writeln("  $domains_str)");
+        $fh->writeln("    echo $fullchain_escaped");
+        $fh->writeln("    echo $key_escaped");
+        $fh->writeln('    ;;');
 
     }
 }

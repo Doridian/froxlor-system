@@ -61,13 +61,15 @@ class TLSConfig {
 abstract class TLSWriter {
     protected array $configs;
     protected ?TLSConfig $default_config;
-    protected SafeTempFile $file;
+    protected readonly string $file;
+    protected readonly int $mode;
     protected readonly bool $write_default;
 
     protected function __construct($file, $mode = 0644, $write_default = false) {
         $this->configs = [];
         $this->default_config = null;
-        $this->file = new SafeTempFile($file, $mode);
+        $this->file = $file;
+        $this->mode = $mode;
         $this->write_default = $write_default;
     }
 
@@ -86,39 +88,34 @@ abstract class TLSWriter {
         }
     }
 
-    protected function writeHeader(): void {
+    protected function writeHeader(SafeTempFile $fh): void {
         // Default implementation does nothing
     }
-    protected function writeConfig(TLSConfig $config): void {
+    protected function writeConfig(SafeTempFile $fh, TLSConfig $config): void {
         foreach ($config->getDomains() as $domain) {
-            $this->writeConfigDomain($config, $domain);
+            $this->writeConfigDomain($fh, $config, $domain);
         }
     }
-    protected function writeConfigDomain(TLSConfig $config, string $domain): void {
+    protected function writeConfigDomain(SafeTempFile $fh, TLSConfig $config, string $domain): void {
         throw new BadMethodCallException("writeConfigDomain must be implemented in subclass");
     }
-    protected function writeFooter(): void { 
+    protected function writeFooter(SafeTempFile $fh): void { 
         // Default implementation does nothing
     }
 
     public function save(): void {
-        $this->writeHeader();
+        $fh = new SafeTempFile($this->file, $this->mode);
+        $this->writeHeader($fh);
         foreach ($this->configs as $config) {
             if (!$this->write_default && $config->isDefault()) {
                 continue;
             }
-            $this->writeConfig($config);
+            $this->writeConfig($fh, $config);
         }
-        $this->writeFooter();
-        $this->file->save();
+        $this->writeFooter($fh);
+        $fh->save();
 
         $this->postSave();
-    }
-
-    public function remove(): void {
-        $this->file->remove();
-        $this->configs = [];
-        $this->default_config = null;
     }
 
     public function postSave(): void {
