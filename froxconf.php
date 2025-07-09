@@ -29,7 +29,7 @@ $pureftpd_tls_fh = fopen('/etc/pure-ftpd/certd.sh', 'w');
 fwrite($pureftpd_tls_fh, "#!/bin/bash\n");
 fwrite($pureftpd_tls_fh, "set -euo pipefail\n");
 chmod('/etc/pure-ftpd/certd.sh', 0755);
-fwrite($pureftpd_tls_fh, 'case "$CERTD_SNI_NAME" in\n');
+fwrite($pureftpd_tls_fh, 'case "$CERTD_SNI_NAME" in' . "\n");
 
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
