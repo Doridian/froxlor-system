@@ -1,6 +1,5 @@
 <?php
 
-require_once 'tmpfile.php';
 require_once 'writer.php';
 
 class PostfixWriter implements TLSWriter {
@@ -10,13 +9,18 @@ class PostfixWriter implements TLSWriter {
         $this->file = new SafeTempFile('/etc/postfix/tls_server_sni_maps', 0640);
     }
 
-    public function write(array $domains, string $fullchain_file, string $key_file): void {
-        foreach ($domains as $domain) {
-            $this->file->writeln($domain . ' ' . $key_file . ' ' . $fullchain_file);
-        }
+    public function writeConfigDomain(TLSConfig $config, string $domain): void {
+        $this->file->writeln($domain . ' ' . $config->key_file . ' ' . $config->fullchain_file);
     }
 
-    public function save(): void {
-        $this->file->save();
+    public function postSave(): void {
+        verbose_run('postmap -F /etc/postfix/tls_server_sni_maps');
+        chmod('/etc/postfix/tls_server_sni_maps.db', 0640);
+        chgrp('/etc/postfix/tls_server_sni_maps.db', 'postfix');
+
+        $escaped = escapeshellarg('smtpd_tls_chain_files=' . $fqdn_key_file . ',' . $fqdn_fullchain_file);
+        verbose_run('postconf -e ' . $escaped);
+
+        verbose_run('systemctl reload postfix');
     }
 }

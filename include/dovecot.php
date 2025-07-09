@@ -1,33 +1,27 @@
 <?php
 
-require_once 'tmpfile.php';
 require_once 'writer.php';
 
-class DovecotWriter implements TLSWriter {
-    private $file;
-
+class DovecotWriter extends TLSWriter {
     public function __construct() {
-        $this->file = new SafeTempFile('/etc/dovecot/conf.d/zzz-tls-sni.conf');
+        parent::__construct('/etc/dovecot/conf.d/zzz-tls-sni.conf');
     }
 
-    public function write(array $domains, string $fullchain_file, string $key_file): void {
-        foreach ($domains as $domain) {
-            $is_default = ($domain === '*');
-            if ($is_default) {
-                $prefix = '';
-            } else {
-                $prefix = '  ';
-                $this->file->writeln("local_name $domain {");
-            }
-            $this->file->writeln($prefix . 'ssl_cert = <' . $fullchain_file);
-            $this->file->writeln($prefix . 'ssl_key = <' . $key_file);
-            if (!$is_default) {
-                $this->file->writeln('}');
-            }
+    protected function writeHeader(): void {
+        if (!empty($this->default_config)) {
+            $this->file->writeln('ssl_cert = <' . $this->default_config->fullchain_file);
+            $this->file->writeln('ssl_key = <' . $this->default_config->key_file);
         }
     }
 
-    public function save(): void {
-        $this->file->save();
+    protected function writeConfigDomain(TLSConfig $config, string $domain): void {
+        $this->file->writeln("local_name $domain {");
+        $this->file->writeln('  ssl_cert = <' . $config->fullchain_file);
+        $this->file->writeln('  ssl_key = <' . $config->key_file);
+        $this->file->writeln('}');
+    }
+
+    public function postSave(): void {
+        verbose_run('systemctl reload dovecot');
     }
 }

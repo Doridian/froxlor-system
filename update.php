@@ -14,8 +14,6 @@ $postfix_map = new PostfixWriter();
 $dovecot_tls = new DovecotWriter();
 $pureftpd_tls = new PureFTPDWriter();
 
-$dovecot_tls->write(['*'], $fqdn_fullchain_file, $fqdn_key_file);
-
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
     $domain_raw = $cert_row['domain'];
@@ -68,45 +66,21 @@ while ($cert_row = $cert_res->fetch_assoc()) {
 
         $domains[] = $domain;
     }
-    unset($domains_raw);
 
     if (empty($domains)) {
         echo "Skipping $domain_raw, no valid domains found in cert\n";
         continue;
     }
 
-    $postfix_map->write($domains, $fullchain_file, $key_file);
-    $dovecot_tls->write($domains, $fullchain_file, $key_file);
-    $pureftpd_tls->write($domains, $fullchain_file, $key_file);
+    $postfix_map->add($domains, $fullchain_file, $key_file);
+    $dovecot_tls->add($domains, $fullchain_file, $key_file);
+    $pureftpd_tls->add($domains, $fullchain_file, $key_file);
 }
 
-unset($cert_row, $cert_res, $domain_raw, $fullchain_file, $key_file, $cert_data, $domains);
-
-$pureftpd_tls->write(['*'], $fqdn_fullchain_file, $fqdn_key_file);
+$postfix_map->add(['*'], $fqdn_fullchain_file, $fqdn_key_file);
+$dovecot_tls->add(['*'], $fqdn_fullchain_file, $fqdn_key_file);
+$pureftpd_tls->add(['*'], $fqdn_fullchain_file, $fqdn_key_file);
 
 $postfix_map->save();
 $dovecot_tls->save();
 $pureftpd_tls->save();
-
-verbose_run('postmap -F /etc/postfix/tls_server_sni_maps');
-chmod('/etc/postfix/tls_server_sni_maps.db', 0640);
-chgrp('/etc/postfix/tls_server_sni_maps.db', 'postfix');
-
-function postconf($values) {
-    $args = [];
-    foreach ($values as $key => $value) {
-        $args[] = escapeshellarg("$key=$value");
-    }
-    verbose_run('postconf ' . implode(' ', $args));
-}
-
-postconf([
-    'smtpd_tls_cert_file' => sslfile_from_domain($fqdn, '.crt'),
-    'smtpd_tls_key_file' => $fqdn_key_file,
-    'smtpd_tls_CAfile' => sslfile_from_domain($fqdn, '_chain.pem'),
-    'smtpd_tls_chain_files' => $fqdn_key_file . ',' . $fqdn_fullchain_file,
-    'tls_server_sni_maps' => 'hash:/etc/postfix/tls_server_sni_maps',
-]);
-
-verbose_run('systemctl reload dovecot');
-verbose_run('systemctl reload postfix');

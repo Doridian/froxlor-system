@@ -21,6 +21,8 @@ fi
 
 rm -rf build
 
+postconf tls_server_sni_maps=hash:/etc/postfix/tls_server_sni_maps
+
 echo 'Running update...'
 systemctl daemon-reload
 systemctl restart cron
