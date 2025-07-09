@@ -33,7 +33,7 @@ class SafeTempFile {
         $this->write($data . "\n");
     }
 
-    private function closefh() {
+    private function close() {
         if (empty($this->fh)) {
             return false;
         }
@@ -43,7 +43,7 @@ class SafeTempFile {
     }
 
     public function save() {
-        if (!$this->closefh()) {
+        if (!$this->close()) {
             return;
         }
         if (!rename($this->tmpname, $this->name)) {
@@ -52,7 +52,7 @@ class SafeTempFile {
     }
 
     public function remove() {
-        $this->closefh();
+        $this->close();
         @unlink($this->tmpname);
     }
 }
