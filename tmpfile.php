@@ -44,7 +44,7 @@ class SafeTempFile {
 
     public function save() {
         if (!$this->close()) {
-            return;
+            throw new Exception("Could not close temporary file (already removed?): $this->tmpname");
         }
         if (!rename($this->tmpname, $this->name)) {
             throw new Exception("Could not rename temporary file to final name: $this->name");
