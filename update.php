@@ -52,16 +52,16 @@ while ($cert_row = $cert_res->fetch_assoc()) {
         continue;
     }
 
-    $domains = [];
-
     $cert_data = openssl_x509_parse($cert_row['ssl_cert_file']);
     if (!$cert_data) {
         echo "Skipping $domain_raw, cert data could not be parsed\n";
         continue;
     }
 
+    $domains_raw = [];
+
     if (!empty($cert_data['subject']['CN'])) {
-        $domains[] = strtolower(trim($cert_data['subject']['CN']));
+        $domains_raw[] = strtolower(trim($cert_data['subject']['CN']));
     }
 
     if (!empty($cert_data['extensions']['subjectAltName'])) {
@@ -73,19 +73,23 @@ while ($cert_row = $cert_res->fetch_assoc()) {
             }
             $san = substr($san, 4); // Remove 'DNS:' prefix
             if (!empty($san)) {
-                $domains[] = $san;
+                $domains_raw[] = $san;
             }
         }
     }
 
-    $domains = array_unique($domains);
+    $domains_raw = array_unique($domains_raw);
 
-    foreach ($domains as $key => $domain) {
+    $domains = [];
+    foreach ($domains_raw as $domain) {
         if (!filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
-            echo "Removing SAN $domain from $domain_raw, invalid hostname\n";
-            unset($domains[$key]);
+            echo "Skipping SAN $domain in $domain_raw, invalid hostname\n";
+            continue;
         }
+
+        $domains[] = $domain;
     }
+    unset($domains_raw);
 
     if (empty($domains)) {
         echo "Skipping $domain_raw, no valid domains found in cert\n";
