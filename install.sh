@@ -6,9 +6,6 @@ export FQDN="$(hostname -f)"
 
 export INSTALLDIR="$(pwd)"
 
-#echo 'Ensuring all LetsEncrypt certificates are present...'
-#./build_cmd.py | sh -x
-
 echo 'Rendering system configuration files...'
 rm -rf build && mkdir -p build
 
