@@ -48,15 +48,23 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     $domain = $cert_row['domain'];
 
     $fullchain_file = SSL_DIR . $domain . '_fullchain.pem';
+    if (!file_exists($fullchain_file)) {
+        echo "Skipping $domain, fullchain file does not exist\n";
+        continue;
+    }
     $key_file = SSL_DIR . $domain . '.key';
+    if (!file_exists($key_file)) {
+        echo "Skipping $domain, key file does not exist\n";
+        continue;
+    }
     $cert_file = SSL_DIR . $domain . '.crt';
+    if (!file_exists($cert_file)) {
+        echo "Skipping $domain, cert file does not exist\n";
+        continue;
+    }
     $chain_file = SSL_DIR . $domain . '_chain.pem';
-    if (!file_exists($fullchain_file) ||
-        !file_exists($key_file) ||
-        !file_exists($cert_file) ||
-        !file_exists($chain_file)) {
-
-        echo "Skipping $domain, one or more SSL/TLS files do not exist:\n";
+    if (!file_exists($chain_file)) {
+        echo "Skipping $domain, chain file does not exist\n";
         continue;
     }
 
