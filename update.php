@@ -113,6 +113,8 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     fwrite($pureftpd_tls_fh, "    ;;\n");
 }
 
+unset($cert_row, $cert_res, $domain_raw, $fullchain_file, $key_file, $cert_data, $domains);
+
 fwrite($pureftpd_tls_fh, "  *)\n");
 fwrite($pureftpd_tls_fh, "    echo 'cert_file:" . $fqdn_fullchain_file . "'\n");
 fwrite($pureftpd_tls_fh, "    echo 'key_file:" . $fqdn_key_file . "'\n");
@@ -137,9 +139,9 @@ function postconf($values) {
 }
 
 postconf([
-    'smtpd_tls_cert_file' => $ssl_dir . $domain . '.crt',
+    'smtpd_tls_cert_file' => $ssl_dir . $fqdn . '.crt',
     'smtpd_tls_key_file' => $fqdn_key_file,
-    'smtpd_tls_CAfile' => $ssl_dir . $domain . '_chain.pem',
+    'smtpd_tls_CAfile' => $ssl_dir . $fqdn . '_chain.pem',
     'smtpd_tls_chain_files' => $fqdn_key_file . ',' . $fqdn_fullchain_file,
     'tls_server_sni_maps' => 'hash:/etc/postfix/tls_server_sni_maps',
 ]);
