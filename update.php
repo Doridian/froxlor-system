@@ -1,10 +1,11 @@
+#!/usr/bin/env php
 <?php
 
 define('SSL_DIR', '/etc/ssl/froxlor-custom/');
 
 require_once '/var/www/html/froxlor/lib/userdata.inc.php';
 
-$fqdn =  getenv('FQDN');
+$fqdn = trim(shell_exec('hostname -f'));
 
 $db = new mysqli(
     $sql['host'],
@@ -109,3 +110,7 @@ fclose($pureftpd_tls_fh);
 passthru('postmap -F /etc/postfix/tls_server_sni_maps');
 chmod('/etc/postfix/tls_server_sni_maps.db', 0640);
 chgrp('/etc/postfix/tls_server_sni_maps.db', 'postfix');
+
+passthru('systemctl restart dovecot');
+passthru('systemctl restart postfix');
+passthru('systemctl restart pure-ftpd-mysql');
