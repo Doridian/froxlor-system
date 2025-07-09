@@ -14,6 +14,10 @@ class SafeTempFile {
             throw new Exception("Could not open temporary file: $this->tmpname");
         }
         chmod($this->tmpname, $chmod);
+
+        register_shutdown_function(function() {
+            $this->close();
+        });
     }
 
     public function write($data) {
