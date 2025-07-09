@@ -7,24 +7,6 @@ require_once 'shared.php';
 //       and only update if they were changed.
 // TODO: Write to temp files and then move them to the final location
 
-function sslfile_from_domain($domain, $suffix) {
-    global $ssl_dir;
-    return $ssl_dir . $domain . $suffix;
-}
-
-function fullchain_from_domain($domain) {
-    return sslfile_from_domain($domain, '_fullchain.pem');
-}
-
-function key_from_domain($domain) {
-    return sslfile_from_domain($domain, '.key');
-}
-
-function verbose_run($command) {
-    echo "Running: $command\n";
-    passthru($command);
-}
-
 $postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
 chmod('/etc/postfix/tls_server_sni_maps', 0640);
 
@@ -37,9 +19,6 @@ chmod('/etc/pure-ftpd/certd.sh', 0755);
 
 fwrite($pureftpd_tls_fh, "echo 'action:strict'\n");
 fwrite($pureftpd_tls_fh, 'case "$CERTD_SNI_NAME" in' . "\n");
-
-$fqdn_fullchain_file = fullchain_from_domain($fqdn);
-$fqdn_key_file = key_from_domain($fqdn);
 
 fwrite($dovecot_tls_fh, "ssl_cert = <$fqdn_fullchain_file\n");
 fwrite($dovecot_tls_fh, "ssl_key = <$fqdn_key_file\n");

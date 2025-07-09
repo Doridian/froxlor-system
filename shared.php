@@ -37,3 +37,24 @@ function get_setting($group, $name) {
 
 $ssl_dir = rtrim(get_setting('system', 'customer_ssl_path'), '/') . '/';
 $fqdn = strtolower(trim(get_setting('system', 'hostname')));
+
+function sslfile_from_domain($domain, $suffix) {
+    global $ssl_dir;
+    return $ssl_dir . $domain . $suffix;
+}
+
+function fullchain_from_domain($domain) {
+    return sslfile_from_domain($domain, '_fullchain.pem');
+}
+
+function key_from_domain($domain) {
+    return sslfile_from_domain($domain, '.key');
+}
+
+function verbose_run($command) {
+    echo "Running: $command\n";
+    passthru($command);
+}
+
+$fqdn_fullchain_file = fullchain_from_domain($fqdn);
+$fqdn_key_file = key_from_domain($fqdn);
