@@ -14,10 +14,10 @@ class SafeTempFile {
             throw new Exception("Could not open temporary file: $this->tmpname");
         }
         chmod($this->tmpname, $chmod);
+    }
 
-        register_shutdown_function(function() {
-            $this->remove();
-        });
+    public function __destruct() {
+        $this->remove();
     }
 
     public function write($data) {
