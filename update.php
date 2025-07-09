@@ -3,6 +3,9 @@
 
 require_once 'shared.php';
 
+// TODO: Detect if certificates were updated since last run
+//       and only update if they were changed.
+
 function sslfile_from_domain($domain, $suffix) {
     global $ssl_dir;
     return $ssl_dir . $domain . $suffix;
