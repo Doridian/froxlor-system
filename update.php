@@ -1,6 +1,9 @@
 #!/usr/bin/env php
 <?php
 
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+
 define('SSL_DIR', '/etc/ssl/froxlor-custom/');
 
 require_once '/var/www/html/froxlor/lib/userdata.inc.php';
