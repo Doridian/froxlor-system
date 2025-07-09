@@ -64,7 +64,7 @@ while ($cert_row = $cert_res->fetch_assoc()) {
         $domains[] = $cert_data['subject']['CN'];
     }
 
-    if (isset($cert_data['extensions']['subjectAltName']) && !empty($cert_data['extensions']['subjectAltName'])) {
+    if (!empty($cert_data['extensions']['subjectAltName'])) {
         $san_array = explode(',', $cert_data['extensions']['subjectAltName']);
         foreach ($san_array as $san) {
             $san = strtolower(trim($san));
