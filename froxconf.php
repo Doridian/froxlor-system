@@ -61,8 +61,20 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     }
 
     if (isset($cert_data['extensions']['subjectAltName']) && !empty($cert_data['extensions']['subjectAltName'])) {
-        echo "\n".$cert_data['extensions']['subjectAltName']."\n";
+        $san_array = explode(',', $cert_data['extensions']['subjectAltName']);
+        foreach ($san_array as $san) {
+            $san = trim($san);
+            if (strpos($san, 'DNS:') !== 0) {
+                continue;
+            }
+            $san = substr($san, 4); // Remove 'DNS:' prefix
+            if (!empty($san)) {
+                $domains[] = $san;
+            }
+        }
     }
+
+    print_r($domains);
 
     $domains_str = implode(' ', $domains);
 
