@@ -26,8 +26,7 @@ function write_pureftpd_tls($domains, $fullchain_file, $key_file) {
     if (count($domains) === 1 && $domains[0] === '*') {
         $domains_str = '*';
     } else {
-        $domains_escaped = array_map('escapeshellarg', $domains);
-        $domains_str = implode('|', $domains_escaped);
+        $domains_str = implode('|', array_map('escapeshellarg', $domains));
     }
 
     $fullchain_escaped = escapeshellarg("cert_file:$fullchain_file");
