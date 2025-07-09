@@ -61,7 +61,7 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     }
 
     if (!empty($cert_data['subject']['CN'])) {
-        $domains[] = $cert_data['subject']['CN'];
+        $domains[] = strtolower(trim($cert_data['subject']['CN']));
     }
 
     if (!empty($cert_data['extensions']['subjectAltName'])) {
@@ -79,6 +79,14 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     }
 
     $domains = array_unique($domains);
+
+    foreach ($domains as $key => $domain) {
+        if (!filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
+            echo "Removing SAN $domain from $domain_raw, invalid hostname\n";
+            unset($domains[$key]);
+        }
+    }
+
     if (empty($domains)) {
         echo "Skipping $domain_raw, no valid domains found in cert\n";
         continue;
