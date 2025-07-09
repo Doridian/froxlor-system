@@ -6,7 +6,6 @@ require_once 'tmpfile.php';
 
 // TODO: Detect if certificates were updated since last run
 //       and only update if they were changed.
-// TODO: Write to temp files and then move them to the final location
 
 $postfix_map = new SafeTempFile('/etc/postfix/tls_server_sni_maps', 0640);
 $dovecot_tls = new SafeTempFile('/etc/dovecot/conf.d/zzz-tls-sni.conf');
