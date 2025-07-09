@@ -11,66 +11,77 @@ $db = new mysqli(
     $sql['db'],
 ) or die('Database connection error '. mysqli_connect_error());
 
-$ips_res = $db->query("SELECT DISTINCT ip FROM panel_ipsandports;");
+$ips_res = $db->query('SELECT DISTINCT ip FROM panel_ipsandports;');
 $ips = [];
 while ($ip_row = $ips_res->fetch_assoc()) {
     $ips[] = $ip_row['ip'];
 }
+$ips_str = implode(' ', $ips);
 
 $postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
 chmod('/etc/postfix/tls_server_sni_maps', 0640);
 $dovecot_tls_fh = fopen('/etc/dovecot/conf.d/zzz-2-tls-sni.conf', 'w');
 $proftpd_tls_fh = fopen('/etc/proftpd/conf.d/tls_sni.conf', 'w');
 
-function add_domain($domain, $key_file, $fullchain_file, $cert_file, $chain_file) {
-    global $postfix_map_fh, $dovecot_tls_fh, $proftpd_tls_fh, $ips;
+$cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
+while ($cert_row = $cert_res->fetch_assoc()) {
+    $domain_raw = $cert_row['domain'];
 
-    fwrite($postfix_map_fh, $domain . ' ' . $key_file . ' ' . $fullchain_file . "\n");
+    $fullchain_file = SSL_DIR . $domain_raw . '_fullchain.pem';
+    if (!file_exists($fullchain_file)) {
+        echo "Skipping $domain_raw, fullchain file does not exist\n";
+        continue;
+    }
+    $key_file = SSL_DIR . $domain_raw . '.key';
+    if (!file_exists($key_file)) {
+        echo "Skipping $domain_raw, key file does not exist\n";
+        continue;
+    }
+    $cert_file = SSL_DIR . $domain_raw . '.crt';
+    if (!file_exists($cert_file)) {
+        echo "Skipping $domain_raw, cert file does not exist\n";
+        continue;
+    }
+    $chain_file = SSL_DIR . $domain_raw . '_chain.pem';
+    if (!file_exists($chain_file)) {
+        echo "Skipping $domain_raw, chain file does not exist\n";
+        continue;
+    }
 
-    fwrite($dovecot_tls_fh, 'local_name ' . $domain . " {\n");
-    fwrite($dovecot_tls_fh, "  ssl_cert = <$fullchain_file\n");
-    fwrite($dovecot_tls_fh, "  ssl_key = <$key_file\n");
-    fwrite($dovecot_tls_fh, "}\n");
+    $domains = [];
 
-    $ip_str = implode(' ', $ips);
-    fwrite($proftpd_tls_fh, "<VirtualHost $ip_str>\n");
-    fwrite($proftpd_tls_fh, "  ServerAlias $domain\n");
+    $cert_data = openssl_x509_parse($cert_row['ssl_cert_file']);
+    if (!$cert_data) {
+        echo "Skipping $domain_raw, cert data could not be parsed\n";
+        continue;
+    }
+
+    if (!empty($cert_data['subject']['CN'])) {
+        $domains[] = $cert_data['subject']['CN'];
+    }
+
+    if (isset($cert_data['extensions']['subjectAltName']) && !empty($cert_data['extensions']['subjectAltName'])) {
+        echo $cert_data['extensions']['subjectAltName'];
+    }
+
+    $domains_str = implode(' ', $domains);
+
+    foreach ($domains as $domain) {
+        fwrite($postfix_map_fh, $domain . ' ' . $key_file . ' ' . $fullchain_file . "\n");
+
+        fwrite($dovecot_tls_fh, 'local_name ' . $domain . " {\n");
+        fwrite($dovecot_tls_fh, "  ssl_cert = <$fullchain_file\n");
+        fwrite($dovecot_tls_fh, "  ssl_key = <$key_file\n");
+        fwrite($dovecot_tls_fh, "}\n");
+    }
+
+    fwrite($proftpd_tls_fh, "<VirtualHost $ips_str>\n");
+    fwrite($proftpd_tls_fh, "  ServerAlias $domains_str\n");
     // TODO: Detect if we are EC or RSA and use the appropriate directives
     fwrite($proftpd_tls_fh, "  TLSRSACertificateFile $cert_file\n");
     fwrite($proftpd_tls_fh, "  TLSCertificateChainFile $chain_file\n");
     fwrite($proftpd_tls_fh, "  TLSRSACertificateKeyFile $key_file\n");
     fwrite($proftpd_tls_fh, "</VirtualHost>\n");
-}
-
-$cert_res = $db->query("SELECT domain, wwwserveralias FROM panel_domains;");
-while ($cert_row = $cert_res->fetch_assoc()) {
-    $domain = $cert_row['domain'];
-
-    $fullchain_file = SSL_DIR . $domain . '_fullchain.pem';
-    if (!file_exists($fullchain_file)) {
-        echo "Skipping $domain, fullchain file does not exist\n";
-        continue;
-    }
-    $key_file = SSL_DIR . $domain . '.key';
-    if (!file_exists($key_file)) {
-        echo "Skipping $domain, key file does not exist\n";
-        continue;
-    }
-    $cert_file = SSL_DIR . $domain . '.crt';
-    if (!file_exists($cert_file)) {
-        echo "Skipping $domain, cert file does not exist\n";
-        continue;
-    }
-    $chain_file = SSL_DIR . $domain . '_chain.pem';
-    if (!file_exists($chain_file)) {
-        echo "Skipping $domain, chain file does not exist\n";
-        continue;
-    }
-
-    add_domain($domain, $key_file, $fullchain_file, $cert_file, $chain_file);
-    if ($cert_row['wwwserveralias']) {
-        add_domain('www.' . $domain, $key_file, $fullchain_file, $cert_file, $chain_file);
-    }
 }
 
 fclose($postfix_map_fh);
