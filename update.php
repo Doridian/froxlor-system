@@ -131,9 +131,7 @@ chgrp('/etc/postfix/tls_server_sni_maps.db', 'postfix');
 function postconf($values) {
     $args = [];
     foreach ($values as $key => $value) {
-        $key = escapeshellarg($key);
-        $escaped_value = escapeshellarg($value);
-        $args[] = "'$key=$escaped_value'";
+        $args[] = escapeshellarg("$key=$value");
     }
     verbose_run("postconf " . implode(' ', $args));
 }
