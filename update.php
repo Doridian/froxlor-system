@@ -64,7 +64,7 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     $domains = [];
     foreach ($domains_raw as $domain) {
         if (!filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
-            echo "Skipping SAN $domain in $domain_raw, invalid hostname\n";
+            echo "Skipping $domain in $domain_raw, invalid hostname\n";
             continue;
         }
 
