@@ -5,7 +5,6 @@ require_once 'writer.php';
 class PureFTPDWriter extends TLSWriter {
     public function __construct() {
         parent::__construct('/etc/pure-ftpd/certd.sh', 0755);
-        $this->file = new SafeTempFile('/etc/pure-ftpd/certd.sh', 0755);
     }
 
     protected function writeHeader(): void {
