@@ -26,4 +26,5 @@ postconf 'tls_server_sni_maps=hash:/etc/postfix/tls_server_sni_maps'
 
 echo 'Running update...'
 systemctl restart cron
+systemctl enable --now pure-certd
 ./update.sh

@@ -4,6 +4,8 @@ define('SSL_DIR', '/etc/ssl/froxlor-custom/');
 
 require_once '/var/www/html/froxlor/lib/userdata.inc.php';
 
+$fqdn =  getenv('FQDN');
+
 $db = new mysqli(
     $sql['host'],
     $sql['user'],
@@ -20,9 +22,14 @@ $ips_str = implode(' ', $ips);
 
 $postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
 chmod('/etc/postfix/tls_server_sni_maps', 0640);
+
 $dovecot_tls_fh = fopen('/etc/dovecot/conf.d/zzz-2-tls-sni.conf', 'w');
-$proftpd_tls_fh = fopen('/etc/proftpd/conf.d/tls-sni.conf', 'w');
-fwrite($proftpd_tls_fh, "<IfModule mod_tls.c>\n");
+
+$pureftpd_tls_fh = fopen('/etc/pure-ftpd/certd.sh', 'w');
+fwrite($pureftpd_tls_fh, "#!/bin/bash\n");
+fwrite($pureftpd_tls_fh, "set -euo pipefail\n");
+chmod('/etc/pure-ftpd/certd.sh', 0755);
+fwrite($pureftpd_tls_fh, "case \"$CERTD_SNI_NAME\" in\n");
 
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
@@ -36,16 +43,6 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     $key_file = SSL_DIR . $domain_raw . '.key';
     if (!file_exists($key_file)) {
         echo "Skipping $domain_raw, key file does not exist\n";
-        continue;
-    }
-    $cert_file = SSL_DIR . $domain_raw . '.crt';
-    if (!file_exists($cert_file)) {
-        echo "Skipping $domain_raw, cert file does not exist\n";
-        continue;
-    }
-    $chain_file = SSL_DIR . $domain_raw . '_chain.pem';
-    if (!file_exists($chain_file)) {
-        echo "Skipping $domain_raw, chain file does not exist\n";
         continue;
     }
 
@@ -94,20 +91,23 @@ while ($cert_row = $cert_res->fetch_assoc()) {
         fwrite($dovecot_tls_fh, "}\n");
     }
 
-    fwrite($proftpd_tls_fh, "<VirtualHost $ips_str>\n");
-    fwrite($proftpd_tls_fh, "  ServerAlias $domains_str\n");
-    // TODO: Detect if we are EC or RSA and use the appropriate directives
-    fwrite($proftpd_tls_fh, "  TLSRSACertificateFile $cert_file\n");
-    fwrite($proftpd_tls_fh, "  TLSCertificateChainFile $chain_file\n");
-    fwrite($proftpd_tls_fh, "  TLSRSACertificateKeyFile $key_file\n");
-    fwrite($proftpd_tls_fh, "</VirtualHost>\n");
+    foreach ($domains as $domain) {
+        fwrite($pureftpd_tls_fh, "  $domain)\n");
+    }
+    fwrite($pureftpd_tls_fh, "    echo 'cert_file:$fullchain_file'\n");
+    fwrite($pureftpd_tls_fh, "    echo 'key_file:$key_file'\n");
+    fwrite($pureftpd_tls_fh, "    ;;\n");
 }
 
-fwrite($proftpd_tls_fh, "</IfModule>\n");
+fwrite($pureftpd_tls_fh, "  *)\n");
+fwrite($pureftpd_tls_fh, "    echo 'cert_file:/etc/ssl/froxlor-custom/" . $fqdn . "_fullchain.pem'\n");
+fwrite($pureftpd_tls_fh, "    echo 'key_file:/etc/ssl/froxlor-custom/" . $fqdn . ".key'\n");
+fwrite($pureftpd_tls_fh, "    ;;\n");
+fwrite($pureftpd_tls_fh, "esac\n");
 
 fclose($postfix_map_fh);
 fclose($dovecot_tls_fh);
-fclose($proftpd_tls_fh);
+fclose($pureftpd_tls_fh);
 
 passthru('postmap -F /etc/postfix/tls_server_sni_maps');
 chmod('/etc/postfix/tls_server_sni_maps.db', 0640);

@@ -1,0 +1,11 @@
+[Unit]
+Description=pure-certd
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/sbin/pure-certd --run /etc/pure-ftpd/certd.sh --socket /var/run/pure-certd.sock --pidfile /var/run/pure-certd.pid -B
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target
