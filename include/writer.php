@@ -11,6 +11,10 @@ class TLSConfig {
 
     public function __construct(array $domains, string $fullchain_file, string $key_file) {
         $this->domains = [];
+        $this->is_default = false;
+        $this->fullchain_file = $fullchain_file;
+        $this->key_file = $key_file;
+
         foreach ($domains as $domain_raw) {
             $domain = strtolower(trim($domain_raw));
             if ($domain === '*') {
@@ -23,9 +27,6 @@ class TLSConfig {
                 echo "Skipping invalid domain: $domain_raw\n";
             }
         }
-    
-        $this->fullchain_file = $fullchain_file;
-        $this->key_file = $key_file;
     }
 
     public function hash(): string {
