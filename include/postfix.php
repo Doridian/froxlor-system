@@ -16,8 +16,10 @@ class PostfixWriter extends TLSWriter {
         chmod('/etc/postfix/tls_server_sni_maps.db', 0640);
         chgrp('/etc/postfix/tls_server_sni_maps.db', 'postfix');
 
-        $escaped = escapeshellarg('smtpd_tls_chain_files=' . $fqdn_key_file . ',' . $fqdn_fullchain_file);
-        verbose_run('postconf -e ' . $escaped);
+        if (!empty($this->default_config)) {
+            $escaped = escapeshellarg('smtpd_tls_chain_files=' . $this->default_config->key_file . ',' . $this->default_config->fullchain_file);
+            verbose_run('postconf -e ' . $escaped);
+        }
 
         verbose_run('systemctl reload postfix');
     }
