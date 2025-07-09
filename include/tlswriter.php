@@ -6,7 +6,7 @@ require_once 'tlsconfig.php';
 
 interface ITLSWriter {
     public function add(array $domains, string $fullchain_file, string $key_file): void;
-    public function setDefault(string $fullchain_file, string $key_file): void;
+    public function setDefault(array $domains, string $fullchain_file, string $key_file): void;
     public function save(): void;
 }
 
