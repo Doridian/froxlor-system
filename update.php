@@ -3,8 +3,6 @@
 
 require_once 'shared.php';
 
-$fqdn = strtolower(trim(get_setting('system', 'hostname')));
-
 function sslfile_from_domain($domain, $suffix) {
     global $ssl_dir;
     return $ssl_dir . $domain . $suffix;
