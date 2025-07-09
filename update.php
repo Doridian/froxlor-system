@@ -3,8 +3,6 @@
 
 require_once 'shared.php';
 
-$fqdn = strtolower(trim(shell_exec('hostname -f')));
-
 $postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
 chmod('/etc/postfix/tls_server_sni_maps', 0640);
 
