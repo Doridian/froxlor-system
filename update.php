@@ -5,13 +5,6 @@ require_once 'shared.php';
 
 $fqdn = strtolower(trim(shell_exec('hostname -f')));
 
-$ips_res = $db->query('SELECT DISTINCT ip FROM panel_ipsandports;');
-$ips = [];
-while ($ip_row = $ips_res->fetch_assoc()) {
-    $ips[] = $ip_row['ip'];
-}
-$ips_str = implode(' ', $ips);
-
 $postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
 chmod('/etc/postfix/tls_server_sni_maps', 0640);
 
