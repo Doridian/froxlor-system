@@ -59,7 +59,7 @@ class TLSConfig {
 
 abstract class TLSWriter {
     protected array $configs;
-    protected TLSConfig $default_config;
+    protected ?TLSConfig $default_config;
     protected SafeTempFile $file;
     protected readonly bool $write_default;
 
