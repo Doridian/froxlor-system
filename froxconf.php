@@ -61,7 +61,7 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     }
 
     if (isset($cert_data['extensions']['subjectAltName']) && !empty($cert_data['extensions']['subjectAltName'])) {
-        echo $cert_data['extensions']['subjectAltName'];
+        echo "\n".$cert_data['extensions']['subjectAltName']."\n";
     }
 
     $domains_str = implode(' ', $domains);
