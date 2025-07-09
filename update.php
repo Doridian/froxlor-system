@@ -4,8 +4,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-define('SSL_DIR', '/etc/ssl/froxlor-custom/');
-
 require_once '/var/www/html/froxlor/lib/userdata.inc.php';
 
 $fqdn = strtolower(trim(shell_exec('hostname -f')));
@@ -16,6 +14,26 @@ $db = new mysqli(
     $sql['password'],
     $sql['db'],
 ) or die('Database connection error '. mysqli_connect_error());
+
+function get_setting($group, $name) {
+    global $db;
+    $stmt = $db->prepare('SELECT value FROM panel_settings WHERE settinggroup = ? AND varname = ? LIMIT 1');
+    $stmt->bind_param('ss', $group, $name);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows === 0) {
+        die("Setting $group.$name not found in panel_settings, please set it in the Froxlor settings.");
+    }
+    $row = $result->fetch_assoc();
+    $value = $row['value'];
+    if (empty($value)) {
+        die("Setting $group.$name is empty, please set it in the Froxlor settings.");
+    }
+    $stmt->close();
+    return $value;
+}
+
+$ssl_dir = rtrim(get_setting('system', 'customer_ssl_path'), '/') . '/';
 
 $ips_res = $db->query('SELECT DISTINCT ip FROM panel_ipsandports;');
 $ips = [];
@@ -41,12 +59,12 @@ $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_f
 while ($cert_row = $cert_res->fetch_assoc()) {
     $domain_raw = $cert_row['domain'];
 
-    $fullchain_file = SSL_DIR . $domain_raw . '_fullchain.pem';
+    $fullchain_file = $ssl_dir . $domain_raw . '_fullchain.pem';
     if (!file_exists($fullchain_file)) {
         echo "Skipping $domain_raw, fullchain file does not exist\n";
         continue;
     }
-    $key_file = SSL_DIR . $domain_raw . '.key';
+    $key_file = $ssl_dir . $domain_raw . '.key';
     if (!file_exists($key_file)) {
         echo "Skipping $domain_raw, key file does not exist\n";
         continue;
@@ -112,8 +130,8 @@ while ($cert_row = $cert_res->fetch_assoc()) {
 }
 
 fwrite($pureftpd_tls_fh, "  *)\n");
-fwrite($pureftpd_tls_fh, "    echo 'cert_file:/etc/ssl/froxlor-custom/" . $fqdn . "_fullchain.pem'\n");
-fwrite($pureftpd_tls_fh, "    echo 'key_file:/etc/ssl/froxlor-custom/" . $fqdn . ".key'\n");
+fwrite($pureftpd_tls_fh, "    echo 'cert_file:" . $ssl_dir . $fqdn . "_fullchain.pem'\n");
+fwrite($pureftpd_tls_fh, "    echo 'key_file:" . $ssl_dir . $fqdn . ".key'\n");
 fwrite($pureftpd_tls_fh, "    ;;\n");
 fwrite($pureftpd_tls_fh, "esac\n");
 fwrite($pureftpd_tls_fh, "echo 'end'\n");
