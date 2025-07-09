@@ -1,6 +1,6 @@
 <?php
 
-require_once 'writer.php';
+require_once 'tlswriter.php';
 
 class PureFTPDWriter extends TLSWriter {
     public function __construct() {
