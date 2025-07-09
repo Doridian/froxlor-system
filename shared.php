@@ -37,3 +37,4 @@ function get_setting($group, $name) {
 }
 
 $ssl_dir = rtrim(get_setting('system', 'customer_ssl_path'), '/') . '/';
+$fqdn = strtolower(trim(get_setting('system', 'hostname')));
