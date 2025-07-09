@@ -15,6 +15,12 @@ class MultiTLSWriter implements ITLSWriter {
         }
     }
 
+    public function setDefault(string $fullchain_file, string $key_file): void {
+        foreach ($this->writers as $writer) {
+            $writer->setDefault($fullchain_file, $key_file);
+        }
+    }
+
     public function save(): void {
         foreach ($this->writers as $writer) {
             $writer->save();

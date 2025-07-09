@@ -17,7 +17,7 @@ $writer = new MultiTLSWriter([
     new PureFTPDWriter(),
 ]);
 
-$writer->add(['*'], $fqdn_fullchain_file, $fqdn_key_file);
+$writer->setDefault([$fqdn], $fqdn_fullchain_file, $fqdn_key_file);
 
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {

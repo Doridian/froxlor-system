@@ -6,6 +6,7 @@ require_once 'tlsconfig.php';
 
 interface ITLSWriter {
     public function add(array $domains, string $fullchain_file, string $key_file): void;
+    public function setDefault(string $fullchain_file, string $key_file): void;
     public function save(): void;
 }
 
@@ -29,14 +30,13 @@ abstract class TLSWriter implements ITLSWriter {
         $old_config = $this->configs[$config->hash()] ?? null;
         if ($old_config) {
             $old_config->append($config);
-            $config = $old_config;
         } else {
             $this->configs[$config->hash()] = $config;
         }
+    }
 
-        if ($config->isDefault()) {
-            $this->default_config = $config;
-        }
+    public function setDefault(array $domains, string $fullchain_file, string $key_file): void {
+        $this->default_config = new TLSConfig($domains, $fullchain_file, $key_file);
     }
 
     protected function writeHeader(SafeTempFile $fh): void {
