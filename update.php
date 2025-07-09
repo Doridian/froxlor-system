@@ -105,7 +105,7 @@ while ($cert_row = $cert_res->fetch_assoc()) {
         fwrite($dovecot_tls_fh, "}\n");
     }
 
-    $domains_str = fwrite($pureftpd_tls_fh, "  '" . implode("'|'", $domains) . "')\n");
+    fwrite($pureftpd_tls_fh, "  '" . implode("'|'", $domains) . "')\n");
     fwrite($pureftpd_tls_fh, "    echo 'cert_file:$fullchain_file'\n");
     fwrite($pureftpd_tls_fh, "    echo 'key_file:$key_file'\n");
     fwrite($pureftpd_tls_fh, "    ;;\n");
