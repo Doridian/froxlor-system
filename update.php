@@ -3,19 +3,6 @@
 
 require_once 'shared.php';
 
-$postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
-chmod('/etc/postfix/tls_server_sni_maps', 0640);
-
-$dovecot_tls_fh = fopen('/etc/dovecot/conf.d/zzz-2-tls-sni.conf', 'w');
-
-$pureftpd_tls_fh = fopen('/etc/pure-ftpd/certd.sh', 'w');
-fwrite($pureftpd_tls_fh, "#!/bin/bash\n");
-fwrite($pureftpd_tls_fh, "set -euo pipefail\n");
-chmod('/etc/pure-ftpd/certd.sh', 0755);
-
-fwrite($pureftpd_tls_fh, "echo 'action:strict'\n");
-fwrite($pureftpd_tls_fh, 'case "$CERTD_SNI_NAME" in' . "\n");
-
 function fullchain_from_domain($domain) {
     global $ssl_dir;
     return $ssl_dir . $domain . '_fullchain.pem';
@@ -25,6 +12,25 @@ function key_from_domain($domain) {
     global $ssl_dir;
     return $ssl_dir . $domain . '.key';
 }
+
+$postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
+chmod('/etc/postfix/tls_server_sni_maps', 0640);
+
+$dovecot_tls_fh = fopen('/etc/dovecot/conf.d/zzz-tls-sni.conf', 'w');
+
+$pureftpd_tls_fh = fopen('/etc/pure-ftpd/certd.sh', 'w');
+fwrite($pureftpd_tls_fh, "#!/bin/bash\n");
+fwrite($pureftpd_tls_fh, "set -euo pipefail\n");
+chmod('/etc/pure-ftpd/certd.sh', 0755);
+
+fwrite($pureftpd_tls_fh, "echo 'action:strict'\n");
+fwrite($pureftpd_tls_fh, 'case "$CERTD_SNI_NAME" in' . "\n");
+
+$fqdn_fullchain_file = fullchain_from_domain($fqdn);
+$fqdn_key_file = key_from_domain($fqdn);
+
+fwrite($dovecot_tls_fh, "ssl_cert = <$fqdn_fullchain_file\n");
+fwrite($dovecot_tls_fh, "ssl_key = <$fqdn_key_file\n");
 
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
@@ -101,8 +107,8 @@ while ($cert_row = $cert_res->fetch_assoc()) {
 }
 
 fwrite($pureftpd_tls_fh, "  *)\n");
-fwrite($pureftpd_tls_fh, "    echo 'cert_file:" . fullchain_from_domain($fqdn) . "'\n");
-fwrite($pureftpd_tls_fh, "    echo 'key_file:" . key_from_domain($fqdn) . "'\n");
+fwrite($pureftpd_tls_fh, "    echo 'cert_file:" . $fqdn_fullchain_file . "'\n");
+fwrite($pureftpd_tls_fh, "    echo 'key_file:" . $fqdn_key_file . "'\n");
 fwrite($pureftpd_tls_fh, "    ;;\n");
 fwrite($pureftpd_tls_fh, "esac\n");
 fwrite($pureftpd_tls_fh, "echo 'end'\n");
