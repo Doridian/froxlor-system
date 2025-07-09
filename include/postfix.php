@@ -3,8 +3,6 @@
 require_once 'writer.php';
 
 class PostfixWriter extends TLSWriter {
-    private $file;
-
     public function __construct() {
         $this->file = new SafeTempFile('/etc/postfix/tls_server_sni_maps', 0640);
     }
