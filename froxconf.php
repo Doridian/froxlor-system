@@ -14,6 +14,7 @@ $db = new mysqli(
 $cert_res = $db->query("SELECT domain, wwwserveralias FROM panel_domains;");
 
 $postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
+chmod('/etc/postfix/tls_server_sni_maps', 0640);
 
 while ($cert_row = $cert_res->fetch_assoc()) {
     $domain = $cert_row['domain'];
@@ -35,3 +36,8 @@ while ($cert_row = $cert_res->fetch_assoc()) {
 }
 
 fclose($postfix_map_fh);
+
+passthru('postmap -F /etc/postfix/tls_server_sni_maps');
+chmod('/etc/postfix/tls_server_sni_maps.db', 0640);
+chown('/etc/postfix/tls_server_sni_maps.db', 'root');
+chgrp('/etc/postfix/tls_server_sni_maps.db', 'postfix');
