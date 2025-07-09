@@ -15,8 +15,8 @@ $cert_res = $db->query("SELECT domain, wwwserveralias FROM panel_domains;");
 
 $postfix_map_fh = fopen('/etc/postfix/tls_server_sni_maps', 'w');
 chmod('/etc/postfix/tls_server_sni_maps', 0640);
-$dovecot_tls_fh = fopen('/etc/dovecot/conf.d/tls-sni.conf', 'w');
-chmod('/etc/dovecot/conf.d/tls-sni.conf', 0640);
+$dovecot_tls_fh = fopen('/etc/dovecot/conf.d/zzz-2-tls-sni.conf', 'w');
+chmod('/etc/dovecot/conf.d/zzz-2-tls-sni.conf', 0640);
 
 function add_domain($domain, $key_file, $fullchain_file) {
     global $postfix_map_fh, $dovecot_tls_fh;
