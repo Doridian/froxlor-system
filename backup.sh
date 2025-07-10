@@ -11,7 +11,7 @@ rsync_cmd() {
     local src="$(realpath "$1")/"
     local dest="/mnt/backups$src"
     mkdir_safe "$dest"
-    rsync -tlrv --delete "$src" "$dest"
+    rsync -avogXAE --delete "$src" "$dest"
 }
 
 echo 'Starting backup process...'
