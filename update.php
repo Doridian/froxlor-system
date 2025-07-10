@@ -54,4 +54,6 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     }
 }
 
+echo 'Hash = ' . $configurator->hash() . "\n";
+
 $configurator->save();

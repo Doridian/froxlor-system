@@ -24,14 +24,14 @@ class TLSConfigurator implements ITLSConfigHolder {
         return $this->default_config;
     }
 
-    public function add(array $domains, string $fullchain_file, string $key_file): TLSConfig {
+    public function add(TLSconfig $config): TLSConfig {
         $config = new TLSConfig($domains, $fullchain_file, $key_file);
-        $old_config = $this->configs[$config->hash()] ?? null;
+        $old_config = $this->configs[$config->uniqueKey()] ?? null;
         if ($old_config) {
             $old_config->append($config);
             return $old_config;
         } else {
-            $this->configs[$config->hash()] = $config;
+            $this->configs[$config->uniqueKey()] = $config;
             return $config;
         }
     }
@@ -63,11 +63,24 @@ class TLSConfigurator implements ITLSConfigHolder {
             return null;
         }
 
-        return $this->add($domains, $fullchain_file, $key_file);
+        return $this->add(new TLSConfig($domains, $fullchain_file, $key_file));
     }
 
     public function setDefault(?TLSConfig $config): void {
-        $this->default_config = $config;
+        if (!$config) {
+            $this->default_config = null;
+            return;
+        }
+        $this->default_config = $this->add($config);
+    }
+
+    public function hash(): string {
+        asort($this->configs, SORT_STRING);
+        $hashes = [];
+        foreach ($this->configs as $config) {
+            $hashes[] = $config->hash();
+        }
+        return hash('sha3-512', implode(PHP_EOL, $hashes));
     }
 
     public function save(): void {

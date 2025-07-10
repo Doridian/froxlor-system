@@ -23,12 +23,17 @@ class TLSConfig {
         }
     }
 
+    public function uniqueKey(): string {
+        return $this->fullchain_file . PHP_EOL . $this->key_file;
+    }
+
     public function hash(): string {
-        return $this->fullchain_file . '|' . $this->key_file;
+        $hashsrc = $this->uniqueKey() . PHP_EOL . filemtime($this->fullchain_file) . PHP_EOL . filemtime($this->key_file);
+        return hash('sha3-512', $hashsrc);
     }
 
     public function append(TLSConfig $other): void {
-        if ($this->fullchain_file !== $other->fullchain_file || $this->key_file !== $other->key_file) {
+        if ($this->uniqueKey() !== $other->uniqueKey()) {
             throw new InvalidArgumentException("Cannot append TLSConfig with different files");
         }
 
