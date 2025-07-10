@@ -14,6 +14,7 @@ class TLSConfig {
         $this->key_file = $key_file;
 
         foreach ($domains as $domain) {
+            $domain = strtolower($domain);
             if (filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
                 $this->domains[$domain] = $domain;
             } else {
