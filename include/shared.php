@@ -39,17 +39,14 @@ function get_setting(string $group, string $name): string {
 $ssl_dir = rtrim(get_setting('system', 'customer_ssl_path'), '/') . '/';
 $fqdn = strtolower(trim(get_setting('system', 'hostname')));
 
-function sslfile_from_domain(string $domain, string $suffix): string {
-    global $ssl_dir;
-    return $ssl_dir . $domain . $suffix;
-}
-
 function fullchain_from_domain(string $domain): string {
-    return sslfile_from_domain($domain, '_fullchain.pem');
+    global $ssl_dir;
+    return $ssl_dir . $domain . '_fullchain.pem';
 }
 
 function key_from_domain(string $domain): string {
-    return sslfile_from_domain($domain, '.key');
+    global $ssl_dir;
+    return $ssl_dir . $domain . '.key';
 }
 
 function verbose_run(string $command): void {
