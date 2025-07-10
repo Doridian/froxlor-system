@@ -20,7 +20,7 @@ $configurator = new TLSConfigurator([
 
 $cert_res = $db->query('SELECT d.domain AS domain, s.domainid AS domainid, s.ssl_cert_file AS ssl_cert_file FROM domain_ssl_settings s LEFT JOIN panel_domains d ON d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
-    $domain_id = $cert_row['domainid'];
+    $domain_id = (int)$cert_row['domainid'];
     if ($domain_id === 0) {
         $domain = $fqdn;
     } else {
