@@ -50,7 +50,7 @@ class SafeTempFile {
         if (!rename($this->tmpName, $this->name)) {
             throw new Exception("Could not rename temporary file to final name: $this->name");
         }
-        echo "Saved file $this->name" . PHP_EOL;
+        echo "Saved: $this->name" . PHP_EOL;
     }
 
     public function remove(): void {
