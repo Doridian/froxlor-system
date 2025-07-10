@@ -25,7 +25,6 @@ class TLSConfigurator implements ITLSConfigHolder {
     }
 
     public function add(TLSconfig $config): TLSConfig {
-        $config = new TLSConfig($domains, $fullchain_file, $key_file);
         $old_config = $this->configs[$config->uniqueKey()] ?? null;
         if ($old_config) {
             $old_config->append($config);
