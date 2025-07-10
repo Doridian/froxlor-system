@@ -3,21 +3,21 @@
 
 require_once 'include/shared.php';
 
-require_once 'include/postfix.php';
-require_once 'include/dovecot.php';
-require_once 'include/pureftpd.php';
-require_once 'include/multiwriter.php';
+require_once 'include/PostfixWriter.php';
+require_once 'include/DovecotWriter.php';
+require_once 'include/PureFTPDWriter.php';
+require_once 'include/TLSConfigurator.php';
 
 // TODO: Detect if certificates were updated since last run
 //       and only update if they were changed.
 
-$writer = new MultiTLSWriter([
+$configurator = new TLSConfigurator([
     new PostfixWriter(),
     new DovecotWriter(),
     new PureFTPDWriter(),
 ]);
 
-$writer->setDefault([$fqdn], $fqdn_fullchain_file, $fqdn_key_file);
+$configurator->setDefault([$fqdn], $fqdn_fullchain_file, $fqdn_key_file);
 
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
@@ -77,7 +77,7 @@ while ($cert_row = $cert_res->fetch_assoc()) {
         continue;
     }
 
-    $writer->add($domains, $fullchain_file, $key_file);
+    $configurator->add($domains, $fullchain_file, $key_file);
 }
 
-$writer->save();
+$configurator->save();

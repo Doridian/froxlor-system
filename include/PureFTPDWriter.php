@@ -1,22 +1,22 @@
 <?php
 
-require_once 'tlswriter.php';
+require_once 'ConfigWriter.php';
 
-class PureFTPDWriter extends TLSWriter {
+class PureFTPDWriter extends ConfigWriter {
     public function __construct() {
         parent::__construct('/etc/pure-ftpd/certd.sh', 0755);
     }
 
-    protected function writeHeader(SafeTempFile $fh): void {
+    protected function writeHeader(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
         $fh->writeln('#!/bin/bash');
         $fh->writeln('set -euo pipefail');
         $fh->writeln("echo 'action:strict'");
         $fh->writeln('case "$CERTD_SNI_NAME" in');
     }
 
-    protected function writeFooter(SafeTempFile $fh): void {
-        if (!empty($this->default_config)) {
-            $this->writeConfigInternal($fh, $this->default_config, '*');
+    protected function writeFooter(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
+        if (!empty($defaultConfig)) {
+            $this->writeConfigInternal($fh, $defaultConfig, '*');
         }
         $fh->writeln('esac');
         $fh->writeln("echo 'end'");

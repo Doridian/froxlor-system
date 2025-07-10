@@ -1,16 +1,16 @@
 <?php
 
-require_once 'tlswriter.php';
+require_once 'ConfigWriter.php';
 
-class DovecotWriter extends TLSWriter {
+class DovecotWriter extends ConfigWriter {
     public function __construct() {
         parent::__construct('/etc/dovecot/conf.d/zzz-tls-sni.conf');
     }
 
-    protected function writeHeader(SafeTempFile $fh): void {
-        if (!empty($this->default_config)) {
-            $fh->writeln('ssl_cert = <' . $this->default_config->fullchain_file);
-            $fh->writeln('ssl_key = <' . $this->default_config->key_file);
+    protected function writeHeader(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
+        if (!empty($defaultConfig)) {
+            $fh->writeln('ssl_cert = <' . $defaultConfig->fullchain_file);
+            $fh->writeln('ssl_key = <' . $defaultConfig->key_file);
         }
     }
 
@@ -21,7 +21,7 @@ class DovecotWriter extends TLSWriter {
         $fh->writeln('}');
     }
 
-    protected function postSave(): void {
+    protected function postSave(?TLSConfig $defaultConfig): void {
         verbose_run('systemctl reload dovecot');
     }
 }
