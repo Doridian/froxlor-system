@@ -18,7 +18,7 @@ class TLSConfig {
             if (filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
                 $this->domains[$domain] = $domain;
             } else {
-                $this->warnings[] = "Skipping invalid domain: $domain\n";
+                $this->warnings[] = "Skipping invalid domain: $domain";
             }
         }
     }

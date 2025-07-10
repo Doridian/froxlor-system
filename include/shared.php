@@ -7,7 +7,7 @@ ini_set('display_errors', '1');
 require_once '/var/www/html/froxlor/lib/userdata.inc.php';
 
 function dieError(string $message): void {
-    echo "Error: $message\n";
+    echo "Error: $message" . PHP_EOL;
     exit(1);
 }
 
@@ -40,6 +40,6 @@ $ssl_dir = rtrim(getSetting('system', 'customer_ssl_path'), '/') . '/';
 $fqdn = getSetting('system', 'hostname');
 
 function verboseRun(string $command): void {
-    echo "Running: $command\n";
+    echo "Running: $command" . PHP_EOL;
     passthru($command);
 }

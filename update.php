@@ -29,12 +29,12 @@ while ($certRow = $certRes->fetch_assoc()) {
 
     $fullChainFile = $ssl_dir . $domain . '_fullchain.pem';
     if (!file_exists($fullChainFile)) {
-        echo "Skipping $domain, fullchain file does not exist\n";
+        echo "Skipping $domain, fullchain file does not exist" . PHP_EOL;
         continue;
     }
     $keyFile = $ssl_dir . $domain . '.key';
     if (!file_exists($keyFile)) {
-        echo "Skipping $domain, key file does not exist\n";
+        echo "Skipping $domain, key file does not exist" . PHP_EOL;
         continue;
     }
 
@@ -61,13 +61,13 @@ $hashFile = __DIR__ . '/tlsconfig.hash';
 if (file_exists($hashFile)) {
     $oldHash = trim(file_get_contents($hashFile));
     if ($oldHash === $newHash) {
-        echo "No changes detected, exiting.\n";
+        echo 'No changes detected, exiting.' . PHP_EOL;
         exit(0);
     }
-    echo "Changes detected, updating TLS configurations.\n";
+    echo 'Changes detected, updating TLS configurations.' . PHP_EOL;
 } else {
     $oldHash = '';
-    echo "No previous hash file found, updating config and creating new one.\n";
+    echo 'No previous hash file found, updating config and creating new one.' . PHP_EOL;
 }
 $configurator->save();
 file_put_contents($hashFile, $newHash . PHP_EOL);

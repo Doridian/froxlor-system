@@ -31,7 +31,7 @@ class SafeTempFile {
     }
 
     public function writeLine(string $data): void {
-        $this->write($data . "\n");
+        $this->write($data . PHP_EOL);
     }
 
     private function close(): bool {
