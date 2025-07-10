@@ -6,13 +6,13 @@ require_once 'TLSConfig.php';
 
 class TLSConfigurator implements ITLSConfigHolder {
     protected array $configs;
-    protected ?TLSConfig $default_config;
+    protected ?TLSConfig $defaultConfig;
     private readonly array $writers;
     private array $warnings;
 
     public function __construct(array $writers) {
         $this->writers = $writers;
-        $this->default_config = null;
+        $this->defaultConfig = null;
         $this->warnings = [];
     }
 
@@ -21,7 +21,7 @@ class TLSConfigurator implements ITLSConfigHolder {
     }
 
     public function getDefaultConfig(): ?TLSConfig {
-        return $this->default_config;
+        return $this->defaultConfig;
     }
 
     public function add(TLSconfig $config): TLSConfig {
@@ -35,16 +35,16 @@ class TLSConfigurator implements ITLSConfigHolder {
         }
     }
 
-    public function addFromData(string $x509_data, string $fullchain_file, string $key_file): ?TLSConfig {
+    public function addFromData(string $x509Data, string $fullChainFile, string $keyFile): ?TLSConfig {
         $domains = [];
 
-        $cert_data = openssl_x509_parse($x509_data);
-        if (!empty($cert_data['subject']['CN'])) {
-            $domains[] = $cert_data['subject']['CN'];
+        $certData = openssl_x509_parse($x509Data);
+        if (!empty($certData['subject']['CN'])) {
+            $domains[] = $certData['subject']['CN'];
         }
 
-        if (!empty($cert_data['extensions']['subjectAltName'])) {
-            $san_array = explode(',', $cert_data['extensions']['subjectAltName']);
+        if (!empty($certData['extensions']['subjectAltName'])) {
+            $san_array = explode(',', $certData['extensions']['subjectAltName']);
             foreach ($san_array as $san) {
                 $san = trim($san);
                 if (stripos($san, 'dns:') !== 0) {
@@ -58,19 +58,19 @@ class TLSConfigurator implements ITLSConfigHolder {
         }
 
         if (empty($domains)) {
-            $this->warnings[] = "Skipping $key_file, no valid domains found in certificate";
+            $this->warnings[] = "Skipping $keyFile, no valid domains found in certificate";
             return null;
         }
 
-        return $this->add(new TLSConfig($domains, $fullchain_file, $key_file));
+        return $this->add(new TLSConfig($domains, $fullChainFile, $keyFile));
     }
 
     public function setDefault(?TLSConfig $config): void {
         if (!$config) {
-            $this->default_config = null;
+            $this->defaultConfig = null;
             return;
         }
-        $this->default_config = $this->add($config);
+        $this->defaultConfig = $this->add($config);
     }
 
     public function hash(): string {

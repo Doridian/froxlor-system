@@ -3,18 +3,18 @@ declare (strict_types=1);
 
 class SafeTempFile {
     private readonly string $name;
-    private readonly string $tmpname;
+    private readonly string $tmpName;
     private mixed $fh;
 
     public function __construct(string $name, int $chmod = 0644) {
         $this->name = $name;
-        $this->tmpname = $name . '.tmp';
-        @unlink($this->tmpname);
-        $this->fh = fopen($this->tmpname, 'w');
+        $this->tmpName = $name . '.tmp';
+        @unlink($this->tmpName);
+        $this->fh = fopen($this->tmpName, 'w');
         if (!$this->fh) {
-            throw new Exception("Could not open temporary file: $this->tmpname");
+            throw new Exception("Could not open temporary file: $this->tmpName");
         }
-        chmod($this->tmpname, $chmod);
+        chmod($this->tmpName, $chmod);
     }
 
     public function __destruct() {
@@ -23,10 +23,10 @@ class SafeTempFile {
 
     public function write(string $data): void {
         if (!$this->fh) {
-            throw new Exception("File not opened: $this->tmpname");
+            throw new Exception("File not opened: $this->tmpName");
         }
         if (fwrite($this->fh, $data) === false) {
-            throw new Exception("Could not write to temporary file: $this->tmpname");
+            throw new Exception("Could not write to temporary file: $this->tmpName");
         }
     }
 
@@ -45,15 +45,15 @@ class SafeTempFile {
 
     public function save(): void {
         if (!$this->close()) {
-            throw new Exception("Could not close temporary file (already removed?): $this->tmpname");
+            throw new Exception("Could not close temporary file (already removed?): $this->tmpName");
         }
-        if (!rename($this->tmpname, $this->name)) {
+        if (!rename($this->tmpName, $this->name)) {
             throw new Exception("Could not rename temporary file to final name: $this->name");
         }
     }
 
     public function remove(): void {
         $this->close();
-        @unlink($this->tmpname);
+        @unlink($this->tmpName);
     }
 }

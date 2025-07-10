@@ -54,5 +54,5 @@ function verbose_run(string $command): void {
     passthru($command);
 }
 
-$fqdn_fullchain_file = fullchain_from_domain($fqdn);
-$fqdn_key_file = key_from_domain($fqdn);
+$fqdn_fullChainFile = fullchain_from_domain($fqdn);
+$fqdn_keyFile = key_from_domain($fqdn);

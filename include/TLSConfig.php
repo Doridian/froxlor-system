@@ -4,14 +4,14 @@ declare (strict_types=1);
 class TLSConfig {
     private array $domains;
     private array $warnings;
-    public readonly string $fullchain_file;
-    public readonly string $key_file;
+    public readonly string $fullChainFile;
+    public readonly string $keyFile;
 
-    public function __construct(array $domains, string $fullchain_file, string $key_file) {
+    public function __construct(array $domains, string $fullChainFile, string $keyFile) {
         $this->domains = [];
         $this->warnings = [];
-        $this->fullchain_file = $fullchain_file;
-        $this->key_file = $key_file;
+        $this->fullChainFile = $fullChainFile;
+        $this->keyFile = $keyFile;
 
         foreach ($domains as $domain) {
             $domain = strtolower($domain);
@@ -24,11 +24,11 @@ class TLSConfig {
     }
 
     public function uniqueKey(): string {
-        return $this->fullchain_file . PHP_EOL . $this->key_file;
+        return $this->fullChainFile . PHP_EOL . $this->keyFile;
     }
 
     public function hash(): string {
-        $hashsrc = $this->uniqueKey() . PHP_EOL . filemtime($this->fullchain_file) . PHP_EOL . filemtime($this->key_file);
+        $hashsrc = $this->uniqueKey() . PHP_EOL . filemtime($this->fullChainFile) . PHP_EOL . filemtime($this->keyFile);
         return hash('sha3-512', $hashsrc);
     }
 

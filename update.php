@@ -18,30 +18,30 @@ $configurator = new TLSConfigurator([
     new PureFTPDWriter(),
 ]);
 
-$cert_res = $db->query('SELECT d.domain AS domain, s.domainid AS domain_id, s.ssl_cert_file AS ssl_cert_data FROM domain_ssl_settings s LEFT JOIN panel_domains d ON d.id = s.domainid;');
-while ($cert_row = $cert_res->fetch_assoc()) {
-    $domain_id = (int)$cert_row['domain_id'];
-    if ($domain_id === 0) {
+$certRes = $db->query('SELECT d.domain AS domain, s.domainid AS domain_id, s.ssl_cert_file AS ssl_certData FROM domain_ssl_settings s LEFT JOIN panel_domains d ON d.id = s.domainid;');
+while ($certRow = $certRes->fetch_assoc()) {
+    $domainId = (int)$certRow['domain_id'];
+    if ($domainId === 0) {
         $domain = $fqdn;
     } else {
-        $domain = $cert_row['domain'];
+        $domain = $certRow['domain'];
     }
 
-    $fullchain_file = fullchain_from_domain($domain);
-    if (!file_exists($fullchain_file)) {
+    $fullChainFile = fullchain_from_domain($domain);
+    if (!file_exists($fullChainFile)) {
         echo "Skipping $domain, fullchain file does not exist\n";
         continue;
     }
-    $key_file = key_from_domain($domain);
-    if (!file_exists($key_file)) {
+    $keyFile = key_from_domain($domain);
+    if (!file_exists($keyFile)) {
         echo "Skipping $domain, key file does not exist\n";
         continue;
     }
 
     $config = $configurator->addFromData(
-        $cert_row['ssl_cert_data'],
-        $fullchain_file,
-        $key_file
+        $certRow['ssl_certData'],
+        $fullChainFile,
+        $keyFile
     );
 
     foreach ($config->getWarnings() as $warning) {
@@ -49,7 +49,7 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     }
     $config->clearWarnings();
 
-    if ($domain_id === 0) {
+    if ($domainId === 0) {
         $configurator->setDefault($config);
     }
 }

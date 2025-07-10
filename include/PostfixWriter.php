@@ -9,7 +9,7 @@ class PostfixWriter extends ConfigWriter {
     }
 
     protected function writeConfigDomain(SafeTempFile $fh, TLSConfig $config, string $domain): void {
-        $fh->writeln($domain . ' ' . $config->key_file . ' ' . $config->fullchain_file);
+        $fh->writeln($domain . ' ' . $config->keyFile . ' ' . $config->fullChainFile);
     }
 
     protected function postSave(?TLSConfig $defaultConfig): void {
@@ -18,7 +18,7 @@ class PostfixWriter extends ConfigWriter {
         chgrp('/etc/postfix/tls_server_sni_maps.db', 'postfix');
 
         if ($defaultConfig) {
-            $escaped = escapeshellarg('smtpd_tls_chain_files=' . $defaultConfig->key_file . ',' . $defaultConfig->fullchain_file);
+            $escaped = escapeshellarg('smtpd_tls_chain_files=' . $defaultConfig->keyFile . ',' . $defaultConfig->fullChainFile);
             verbose_run('postconf -e ' . $escaped);
         }
 
