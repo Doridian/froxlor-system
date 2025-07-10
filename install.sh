@@ -21,7 +21,8 @@ fi
 
 rm -rf build
 
-postconf tls_server_sni_maps=hash:/etc/postfix/tls_server_sni_maps
+postconf -e tls_server_sni_maps=hash:/etc/postfix/tls_server_sni_maps
+postconf -X smtpd_tls_CAfile smtpd_tls_cert_file smtpd_tls_key_file
 
 echo 'Running update...'
 systemctl daemon-reload
