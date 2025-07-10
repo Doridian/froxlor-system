@@ -2,34 +2,35 @@
 set -euo pipefail
 
 mkdir_safe() {
-    mkdir -p "$1"
-    chmod 700 "$1"
+    local dir="$1"
+    mkdir -p "$dir"
+    chmod 700 "$dir"
 }
 
 rsync_cmd() {
-    rsync -tlrv --delete "$1" "$2"
+    local src="$1"
+    local dest="/mnt/backups$src"
+    mkdir_safe "$dest"
+    rsync -tlrv --delete "$src" "$dest"
 }
 
 echo 'Starting backup process...'
 
 echo 'Backing up system files...'
-mkdir_safe /mnt/backups/system
-rsync_cmd /etc/ /mnt/backups/system/etc/
+rsync_cmd /etc/
 
 echo 'Backing up websites...'
-mkdir_safe /mnt/backups/webs
-rsync_cmd /var/customers/webs/ /mnt/backups/webs/
+rsync_cmd /var/customers/webs/
 
 echo 'Backing up emails...'
-mkdir_safe /mnt/backups/mail
-rsync_cmd /var/customers/mail/ /mnt/backups/mail/
+rsync_cmd /var/customers/mail/
 
 echo 'Backing up crontabs...'
-mkdir_safe /mnt/backups/crontabs
-rsync_cmd /var/spool/cron/crontabs/ /mnt/backups/crontabs/
+rsync_cmd /var/spool/cron/crontabs/
 
 echo 'Backing up MySQL databases...'
-rm -rf /mnt/backups/mysql
-mkdir_safe /mnt/backups/mysql
-mariadb-backup --backup --target-dir /mnt/backups/mysql
-mariadb-backup --prepare --target-dir /mnt/backups/mysql
+mysql_dir=/mnt/backups/var/lib/mysql
+rm -rf "$mysql_dir"
+mkdir_safe "$mysql_dir"
+mariadb-backup --backup --target-dir "$mysql_dir"
+mariadb-backup --prepare --target-dir "$mysql_dir"
