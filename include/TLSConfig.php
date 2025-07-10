@@ -37,7 +37,7 @@ class TLSConfig {
     }
 
     public function getDomains(): array {
-        return $this->domains;
+        return array_values($this->domains);
     }
 
     public function getWarnings(): array {
