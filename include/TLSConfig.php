@@ -3,11 +3,13 @@ declare (strict_types=1);
 
 class TLSConfig {
     private array $domains;
+    private array $warnings;
     public readonly string $fullchain_file;
     public readonly string $key_file;
 
     public function __construct(array $domains, string $fullchain_file, string $key_file) {
         $this->domains = [];
+        $this->warnings = [];
         $this->fullchain_file = $fullchain_file;
         $this->key_file = $key_file;
 
@@ -15,7 +17,7 @@ class TLSConfig {
             if (filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
                 $this->domains[] = $domain;
             } else {
-                echo "Skipping invalid domain: $domain\n";
+                $this->warnings[] = "Skipping invalid domain: $domain\n";
             }
         }
     }
@@ -38,5 +40,13 @@ class TLSConfig {
 
     public function getDomains(): array {
         return $this->domains;
+    }
+
+    public function getWarnings(): array {
+        return $this->warnings;
+    }
+
+    public function clearWarnings(): void {
+        $this->warnings = [];
     }
 }

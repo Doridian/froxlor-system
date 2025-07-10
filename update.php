@@ -39,11 +39,15 @@ while ($cert_row = $cert_res->fetch_assoc()) {
     }
 
     $config = $configurator->addFromData(
-        $domain,
         $cert_row['ssl_cert_data'],
         $fullchain_file,
         $key_file
     );
+
+    foreach ($config->getWarnings() as $warning) {
+        echo "Warning for $domain: $warning";
+    }
+    $config->clearWarnings();
 
     if ($domain_id === 0) {
         $configurator->setDefault($config);

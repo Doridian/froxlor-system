@@ -8,10 +8,12 @@ class TLSConfigurator implements ITLSConfigHolder {
     protected array $configs;
     protected ?TLSConfig $default_config;
     private readonly array $writers;
+    private array $warnings;
 
     public function __construct(array $writers) {
         $this->writers = $writers;
         $this->default_config = null;
+        $this->warnings = [];
     }
 
     public function getConfigs(): array {
@@ -34,7 +36,7 @@ class TLSConfigurator implements ITLSConfigHolder {
         }
     }
 
-    public function addFromData(string $domain, string $x509_data, string $fullchain_file, string $key_file): ?TLSConfig {
+    public function addFromData(string $x509_data, string $fullchain_file, string $key_file): ?TLSConfig {
         $domains = [];
 
         $cert_data = openssl_x509_parse($x509_data);
@@ -59,7 +61,7 @@ class TLSConfigurator implements ITLSConfigHolder {
         $domains = array_unique($domains);
 
         if (empty($domains)) {
-            echo "Skipping $domain, no valid domains found in cert\n";
+            $this->warnings[] = "Skipping $key_file, no valid domains found in certificate";
             return null;
         }
 
@@ -74,5 +76,20 @@ class TLSConfigurator implements ITLSConfigHolder {
         foreach ($this->writers as $writer) {
             $writer->save($this);
         }
+    }
+
+    public function clearWarnings(): void {
+        $this->warnings = [];
+        foreach ($this->configs as $config) {
+            $config->clearWarnings();
+        }
+    }
+
+    public function getWarnings(): array {
+        $warnings = $this->warnings;
+        foreach ($this->configs as $config) {
+            $warnings = array_merge($warnings, $config->getWarnings());
+        }
+        return $warnings;
     }
 }
