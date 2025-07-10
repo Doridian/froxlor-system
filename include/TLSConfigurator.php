@@ -48,7 +48,7 @@ class TLSConfigurator implements ITLSConfigHolder {
             $san_array = explode(',', $cert_data['extensions']['subjectAltName']);
             foreach ($san_array as $san) {
                 $san = trim($san);
-                if (strpos($san, 'dns:') !== 0) {
+                if (stripos($san, 'dns:') !== 0) {
                     continue;
                 }
                 $san = substr($san, 4); // Remove 'DNS:' prefix
