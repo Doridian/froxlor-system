@@ -27,12 +27,12 @@ while ($certRow = $certRes->fetch_assoc()) {
         $domain = $certRow['domain'];
     }
 
-    $fullChainFile = fullchain_from_domain($domain);
+    $fullChainFile = $ssl_dir . $domain . '_fullchain.pem';
     if (!file_exists($fullChainFile)) {
         echo "Skipping $domain, fullchain file does not exist\n";
         continue;
     }
-    $keyFile = key_from_domain($domain);
+    $keyFile = $ssl_dir . $domain . '.key';
     if (!file_exists($keyFile)) {
         echo "Skipping $domain, key file does not exist\n";
         continue;

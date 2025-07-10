@@ -24,17 +24,17 @@ class PureFTPDWriter extends ConfigWriter {
     }
 
     protected function writeConfig(SafeTempFile $fh, TLSConfig $config): void {
-        $domains_str = implode('|', array_map('escapeshellarg', $config->getDomains()));
-        $this->writeConfigInternal($fh, $config, $domains_str);
+        $domainsStr = implode('|', array_map('escapeshellarg', $config->getDomains()));
+        $this->writeConfigInternal($fh, $config, $domainsStr);
     }
 
-    private function writeConfigInternal(SafeTempFile $fh, TLSConfig $config, string $domains_str): void {
-        $fullchain_escaped = escapeshellarg("cert_file:{$config->fullChainFile}");
-        $key_escaped = escapeshellarg("keyFile:{$config->keyFile}");
+    private function writeConfigInternal(SafeTempFile $fh, TLSConfig $config, string $domainsStr): void {
+        $fullChainEscaped = escapeshellarg("cert_file:{$config->fullChainFile}");
+        $keyEscaped = escapeshellarg("keyFile:{$config->keyFile}");
 
-        $fh->writeln("  $domains_str)");
-        $fh->writeln("    echo $fullchain_escaped");
-        $fh->writeln("    echo $key_escaped");
+        $fh->writeln("  $domainsStr)");
+        $fh->writeln("    echo $fullChainEscaped");
+        $fh->writeln("    echo $keyEscaped");
         $fh->writeln('    ;;');
 
     }

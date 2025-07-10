@@ -13,15 +13,15 @@ class PostfixWriter extends ConfigWriter {
     }
 
     protected function postSave(?TLSConfig $defaultConfig): void {
-        verbose_run('postmap -F /etc/postfix/tls_server_sni_maps');
+        verboseRun('postmap -F /etc/postfix/tls_server_sni_maps');
         chmod('/etc/postfix/tls_server_sni_maps.db', 0640);
         chgrp('/etc/postfix/tls_server_sni_maps.db', 'postfix');
 
         if ($defaultConfig) {
             $escaped = escapeshellarg('smtpd_tls_chain_files=' . $defaultConfig->keyFile . ',' . $defaultConfig->fullChainFile);
-            verbose_run('postconf -e ' . $escaped);
+            verboseRun('postconf -e ' . $escaped);
         }
 
-        verbose_run('systemctl reload postfix');
+        verboseRun('systemctl reload postfix');
     }
 }

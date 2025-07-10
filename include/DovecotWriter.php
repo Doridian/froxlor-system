@@ -23,6 +23,6 @@ class DovecotWriter extends ConfigWriter {
     }
 
     protected function postSave(?TLSConfig $defaultConfig): void {
-        verbose_run('systemctl reload dovecot');
+        verboseRun('systemctl reload dovecot');
     }
 }
