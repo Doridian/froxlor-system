@@ -35,40 +35,12 @@ while ($cert_row = $cert_res->fetch_assoc()) {
         continue;
     }
 
-    $cert_data = openssl_x509_parse($cert_row['ssl_cert_file']);
-    if (!$cert_data) {
-        echo "Skipping $domain, cert data could not be parsed\n";
-        continue;
-    }
-
-    $domains = [];
-
-    if (!empty($cert_data['subject']['CN'])) {
-        $domains[] = strtolower(trim($cert_data['subject']['CN']));
-    }
-
-    if (!empty($cert_data['extensions']['subjectAltName'])) {
-        $san_array = explode(',', $cert_data['extensions']['subjectAltName']);
-        foreach ($san_array as $san) {
-            $san = strtolower(trim($san));
-            if (strpos($san, 'dns:') !== 0) {
-                continue;
-            }
-            $san = substr($san, 4); // Remove 'DNS:' prefix
-            if (!empty($san)) {
-                $domains[] = $san;
-            }
-        }
-    }
-
-    $domains = array_unique($domains);
-
-    if (empty($domains)) {
-        echo "Skipping $domain, no valid domains found in cert\n";
-        continue;
-    }
-
-    $configurator->add($domains, $fullchain_file, $key_file);
+    $configurator->addFromData(
+        $domain,
+        $cert_row['ssl_cert_file'],
+        $fullchain_file,
+        $key_file
+    );
 }
 
 $configurator->save();
