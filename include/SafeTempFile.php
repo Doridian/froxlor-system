@@ -21,7 +21,7 @@ class SafeTempFile {
     }
 
     public function write($data) {
-        if (empty($this->fh)) {
+        if (!$this->fh) {
             throw new Exception("File not opened: $this->tmpname");
         }
         if (fwrite($this->fh, $data) === false) {
@@ -34,7 +34,7 @@ class SafeTempFile {
     }
 
     private function close() {
-        if (empty($this->fh)) {
+        if (!$this->fh) {
             return false;
         }
         fclose($this->fh);

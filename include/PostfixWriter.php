@@ -16,7 +16,7 @@ class PostfixWriter extends ConfigWriter {
         chmod('/etc/postfix/tls_server_sni_maps.db', 0640);
         chgrp('/etc/postfix/tls_server_sni_maps.db', 'postfix');
 
-        if (!empty($defaultConfig)) {
+        if ($defaultConfig) {
             $escaped = escapeshellarg('smtpd_tls_chain_files=' . $defaultConfig->key_file . ',' . $defaultConfig->fullchain_file);
             verbose_run('postconf -e ' . $escaped);
         }

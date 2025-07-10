@@ -15,7 +15,7 @@ class PureFTPDWriter extends ConfigWriter {
     }
 
     protected function writeFooter(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
-        if (!empty($defaultConfig)) {
+        if ($defaultConfig) {
             $this->writeConfigInternal($fh, $defaultConfig, '*');
         }
         $fh->writeln('esac');

@@ -8,7 +8,7 @@ class DovecotWriter extends ConfigWriter {
     }
 
     protected function writeHeader(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
-        if (!empty($defaultConfig)) {
+        if ($defaultConfig) {
             $fh->writeln('ssl_cert = <' . $defaultConfig->fullchain_file);
             $fh->writeln('ssl_key = <' . $defaultConfig->key_file);
         }
