@@ -22,29 +22,29 @@ $configurator->setDefault([$fqdn], $fqdn_fullchain_file, $fqdn_key_file);
 
 $cert_res = $db->query('SELECT d.domain AS domain, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d, domain_ssl_settings s WHERE d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
-    $domain_raw = $cert_row['domain'];
+    $domain = $cert_row['domain'];
 
-    $fullchain_file = fullchain_from_domain($domain_raw);
+    $fullchain_file = fullchain_from_domain($domain);
     if (!file_exists($fullchain_file)) {
-        echo "Skipping $domain_raw, fullchain file does not exist\n";
+        echo "Skipping $domain, fullchain file does not exist\n";
         continue;
     }
-    $key_file = key_from_domain($domain_raw);
+    $key_file = key_from_domain($domain);
     if (!file_exists($key_file)) {
-        echo "Skipping $domain_raw, key file does not exist\n";
+        echo "Skipping $domain, key file does not exist\n";
         continue;
     }
 
     $cert_data = openssl_x509_parse($cert_row['ssl_cert_file']);
     if (!$cert_data) {
-        echo "Skipping $domain_raw, cert data could not be parsed\n";
+        echo "Skipping $domain, cert data could not be parsed\n";
         continue;
     }
 
-    $domains_raw = [];
+    $domains = [];
 
     if (!empty($cert_data['subject']['CN'])) {
-        $domains_raw[] = strtolower(trim($cert_data['subject']['CN']));
+        $domains[] = strtolower(trim($cert_data['subject']['CN']));
     }
 
     if (!empty($cert_data['extensions']['subjectAltName'])) {
@@ -56,25 +56,15 @@ while ($cert_row = $cert_res->fetch_assoc()) {
             }
             $san = substr($san, 4); // Remove 'DNS:' prefix
             if (!empty($san)) {
-                $domains_raw[] = $san;
+                $domains[] = $san;
             }
         }
     }
 
-    $domains_raw = array_unique($domains_raw);
-
-    $domains = [];
-    foreach ($domains_raw as $domain) {
-        if (!filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
-            echo "Skipping $domain in $domain_raw, invalid hostname\n";
-            continue;
-        }
-
-        $domains[] = $domain;
-    }
+    $domains = array_unique($domains);
 
     if (empty($domains)) {
-        echo "Skipping $domain_raw, no valid domains found in cert\n";
+        echo "Skipping $domain, no valid domains found in cert\n";
         continue;
     }
 
