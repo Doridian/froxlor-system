@@ -2,11 +2,11 @@
 declare (strict_types=1);
 
 class SafeTempFile {
-    private $name;
-    private $tmpname;
-    private $fh;
+    private readonly string $name;
+    private readonly string $tmpname;
+    private mixed $fh;
 
-    public function __construct($name, $chmod = 0644) {
+    public function __construct(string $name, int $chmod = 0644) {
         $this->name = $name;
         $this->tmpname = $name . '.tmp';
         @unlink($this->tmpname);
@@ -39,7 +39,7 @@ class SafeTempFile {
             return false;
         }
         fclose($this->fh);
-        unset($this->fh);
+        $this->fh = false;
         return true;
     }
 
