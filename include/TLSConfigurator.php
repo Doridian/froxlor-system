@@ -76,11 +76,11 @@ class TLSConfigurator implements ITLSConfigHolder {
     public function hash(): string {
         $keys = array_keys($this->configs);
         sort($keys, SORT_STRING);
-        $hashes = [];
+        $hash = hash_init('sha3-512');
         foreach ($keys as $key) {
-            $hashes[] = $this->configs[$key]->hash();
+            hash_update($hash, $this->configs[$key]->hash() . PHP_EOL);
         }
-        return hash('sha3-512', implode(PHP_EOL, $hashes));
+        return hash_final($hash, false);
     }
 
     public function save(): void {
