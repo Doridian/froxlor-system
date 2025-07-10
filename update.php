@@ -18,7 +18,7 @@ $configurator = new TLSConfigurator([
     new PureFTPDWriter(),
 ]);
 
-$cert_res = $db->query('SELECT d.domain AS domain, s.domainid AS domainid, s.ssl_cert_file AS ssl_cert_file FROM panel_domains d LEFT JOIN domain_ssl_settings s ON d.id = s.domainid;');
+$cert_res = $db->query('SELECT d.domain AS domain, s.domainid AS domainid, s.ssl_cert_file AS ssl_cert_file FROM domain_ssl_settings s LEFT JOIN panel_domains d ON d.id = s.domainid;');
 while ($cert_row = $cert_res->fetch_assoc()) {
     $domain_id = $cert_row['domainid'];
     if ($domain_id === 0) {

@@ -11,6 +11,7 @@ class TLSConfigurator implements ITLSConfigHolder {
 
     public function __construct(array $writers) {
         $this->writers = $writers;
+        $this->default_config = null;
     }
 
     public function getConfigs(): array {
