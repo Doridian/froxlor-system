@@ -55,7 +55,7 @@ while ($cert_row = $cert_res->fetch_assoc()) {
 }
 
 $hashFile = __DIR__ . '/tlsconfig.hash';
-$oldHash = @file_get_contents($hashFile);
+$oldHash = trim(@file_get_contents($hashFile));
 $newHash = $configurator->hash();
 if ($oldHash === $newHash) {
     echo "No changes detected, exiting.\n";
@@ -63,4 +63,4 @@ if ($oldHash === $newHash) {
 }
 echo "Changes detected, updating TLS configurations.\n";
 $configurator->save();
-file_put_contents($hashFile, $newHash);
+file_put_contents($hashFile, $newHash . PHP_EOL);
