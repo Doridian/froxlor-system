@@ -21,7 +21,7 @@ class SafeTempFile {
         $this->remove();
     }
 
-    public function write($data) {
+    public function write(string $data): void {
         if (!$this->fh) {
             throw new Exception("File not opened: $this->tmpname");
         }
@@ -30,11 +30,11 @@ class SafeTempFile {
         }
     }
 
-    public function writeln($data) {
+    public function writeln(string $data): void {
         $this->write($data . "\n");
     }
 
-    private function close() {
+    private function close(): bool {
         if (!$this->fh) {
             return false;
         }
@@ -43,7 +43,7 @@ class SafeTempFile {
         return true;
     }
 
-    public function save() {
+    public function save(): void {
         if (!$this->close()) {
             throw new Exception("Could not close temporary file (already removed?): $this->tmpname");
         }
@@ -52,7 +52,7 @@ class SafeTempFile {
         }
     }
 
-    public function remove() {
+    public function remove(): void {
         $this->close();
         @unlink($this->tmpname);
     }

@@ -6,7 +6,7 @@ ini_set('display_errors', '1');
 
 require_once '/var/www/html/froxlor/lib/userdata.inc.php';
 
-function die_error($message) {
+function die_error(string $message): void {
     echo "Error: $message\n";
     exit(1);
 }
@@ -18,7 +18,7 @@ $db = new mysqli(
     $sql['db'],
 ) or die_error('Database connection error '. mysqli_connect_error());
 
-function get_setting($group, $name) {
+function get_setting(string $group, string $name): string {
     global $db;
     $stmt = $db->prepare('SELECT value FROM panel_settings WHERE settinggroup = ? AND varname = ? LIMIT 1');
     $stmt->bind_param('ss', $group, $name);
@@ -39,20 +39,20 @@ function get_setting($group, $name) {
 $ssl_dir = rtrim(get_setting('system', 'customer_ssl_path'), '/') . '/';
 $fqdn = strtolower(trim(get_setting('system', 'hostname')));
 
-function sslfile_from_domain($domain, $suffix) {
+function sslfile_from_domain(string $domain, string $suffix): string {
     global $ssl_dir;
     return $ssl_dir . $domain . $suffix;
 }
 
-function fullchain_from_domain($domain) {
+function fullchain_from_domain(string $domain): string {
     return sslfile_from_domain($domain, '_fullchain.pem');
 }
 
-function key_from_domain($domain) {
+function key_from_domain(string $domain): string {
     return sslfile_from_domain($domain, '.key');
 }
 
-function verbose_run($command) {
+function verbose_run(string $command): void {
     echo "Running: $command\n";
     passthru($command);
 }
