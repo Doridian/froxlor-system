@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+BACKUP_ROOT=/mnt/backups
+
 mkdir_safe() {
     local dir="$1"
     mkdir -p "$dir"
@@ -9,7 +11,7 @@ mkdir_safe() {
 
 rsync_cmd() {
     local src="$(realpath "$1")/"
-    local dest="/mnt/backups$src"
+    local dest="$BACKUP_ROOT$src"
     mkdir_safe "$dest"
     rsync -avogXAE --delete "$src" "$dest"
 }
@@ -29,7 +31,7 @@ echo 'Backing up crontabs...'
 rsync_cmd /var/spool/cron/crontabs/
 
 echo 'Backing up MySQL databases...'
-mysql_dir=/mnt/backups/var/lib/mysql
+mysql_dir="$BACKUP_ROOT/var/lib/mysql"
 rm -rf "$mysql_dir"
 mkdir_safe "$mysql_dir"
 mariadb-backup --backup --target-dir "$mysql_dir"
