@@ -7,7 +7,7 @@ mkdir_safe() {
 }
 
 rsync_cmd() {
-    rsync -trv --delete "$1" "$2"
+    rsync -tlrv --delete "$1" "$2"
 }
 
 echo 'Starting backup process...'
