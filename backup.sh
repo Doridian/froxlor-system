@@ -8,7 +8,7 @@ mkdir_safe() {
 }
 
 rsync_cmd() {
-    local src="$1"
+    local src="$(realpath "$1")/"
     local dest="/mnt/backups$src"
     mkdir_safe "$dest"
     rsync -tlrv --delete "$src" "$dest"
