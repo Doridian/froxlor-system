@@ -37,7 +37,7 @@ function get_setting(string $group, string $name): string {
 }
 
 $ssl_dir = rtrim(get_setting('system', 'customer_ssl_path'), '/') . '/';
-$fqdn = strtolower(trim(get_setting('system', 'hostname')));
+$fqdn = get_setting('system', 'hostname');
 
 function fullchain_from_domain(string $domain): string {
     global $ssl_dir;

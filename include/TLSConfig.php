@@ -11,12 +11,11 @@ class TLSConfig {
         $this->fullchain_file = $fullchain_file;
         $this->key_file = $key_file;
 
-        foreach ($domains as $domain_raw) {
-            $domain = strtolower(trim($domain_raw));
+        foreach ($domains as $domain) {
             if (filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
                 $this->domains[] = $domain;
             } else {
-                echo "Skipping invalid domain: $domain_raw\n";
+                echo "Skipping invalid domain: $domain\n";
             }
         }
     }

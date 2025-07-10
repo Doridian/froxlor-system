@@ -38,19 +38,19 @@ class TLSConfigurator implements ITLSConfigHolder {
 
         $cert_data = openssl_x509_parse($x509_data);
         if (!empty($cert_data['subject']['CN'])) {
-            $domains[] = strtolower(trim($cert_data['subject']['CN']));
+            $domains[] = $cert_data['subject']['CN'];
         }
 
         if (!empty($cert_data['extensions']['subjectAltName'])) {
             $san_array = explode(',', $cert_data['extensions']['subjectAltName']);
             foreach ($san_array as $san) {
-                $san = strtolower(trim($san));
+                $san = trim($san);
                 if (strpos($san, 'dns:') !== 0) {
                     continue;
                 }
                 $san = substr($san, 4); // Remove 'DNS:' prefix
                 if (!empty($san)) {
-                    $domains[] = $san;
+                    $domains[] = trim($san);
                 }
             }
         }
@@ -65,9 +65,8 @@ class TLSConfigurator implements ITLSConfigHolder {
         return $this->add($domains, $fullchain_file, $key_file);
     }
 
-    public function setDefault(array $domains, string $fullchain_file, string $key_file): TLSConfig {
-        $this->default_config = $this->add($domains, $fullchain_file, $key_file);
-        return $this->default_config;
+    public function setDefault(?TLSConfig $config): void {
+        $this->default_config = $config;
     }
 
     public function save(): void {
