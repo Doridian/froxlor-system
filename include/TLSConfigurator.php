@@ -58,8 +58,6 @@ class TLSConfigurator implements ITLSConfigHolder {
             }
         }
 
-        $domains = array_unique($domains);
-
         if (empty($domains)) {
             $this->warnings[] = "Skipping $key_file, no valid domains found in certificate";
             return null;

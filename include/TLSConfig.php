@@ -15,7 +15,7 @@ class TLSConfig {
 
         foreach ($domains as $domain) {
             if (filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
-                $this->domains[] = $domain;
+                $this->domains[$domain] = $domain;
             } else {
                 $this->warnings[] = "Skipping invalid domain: $domain\n";
             }
@@ -32,14 +32,12 @@ class TLSConfig {
         }
 
         foreach ($other->domains as $domain) {
-            if (!in_array($domain, $this->domains, true)) {
-                $this->domains[] = $domain;
-            }
+            $this->domains[$domain] = $domain;
         }
     }
 
     public function getDomains(): array {
-        return $this->domains;
+        return array_values($this->domains);
     }
 
     public function getWarnings(): array {
