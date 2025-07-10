@@ -9,7 +9,7 @@ class PostfixWriter extends ConfigWriter {
     }
 
     protected function writeConfigDomain(SafeTempFile $fh, TLSConfig $config, string $domain): void {
-        $fh->writeln($domain . ' ' . $config->keyFile . ' ' . $config->fullChainFile);
+        $fh->writeLine($domain . ' ' . $config->keyFile . ' ' . $config->fullChainFile);
     }
 
     protected function postSave(?TLSConfig $defaultConfig): void {

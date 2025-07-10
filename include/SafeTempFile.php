@@ -30,7 +30,7 @@ class SafeTempFile {
         }
     }
 
-    public function writeln(string $data): void {
+    public function writeLine(string $data): void {
         $this->write($data . "\n");
     }
 

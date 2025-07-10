@@ -9,18 +9,18 @@ class PureFTPDWriter extends ConfigWriter {
     }
 
     protected function writeHeader(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
-        $fh->writeln('#!/bin/bash');
-        $fh->writeln('set -euo pipefail');
-        $fh->writeln("echo 'action:strict'");
-        $fh->writeln('case "$CERTD_SNI_NAME" in');
+        $fh->writeLine('#!/bin/bash');
+        $fh->writeLine('set -euo pipefail');
+        $fh->writeLine("echo 'action:strict'");
+        $fh->writeLine('case "$CERTD_SNI_NAME" in');
     }
 
     protected function writeFooter(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
         if ($defaultConfig) {
             $this->writeConfigInternal($fh, $defaultConfig, '*');
         }
-        $fh->writeln('esac');
-        $fh->writeln("echo 'end'");
+        $fh->writeLine('esac');
+        $fh->writeLine("echo 'end'");
     }
 
     protected function writeConfig(SafeTempFile $fh, TLSConfig $config): void {
@@ -32,10 +32,10 @@ class PureFTPDWriter extends ConfigWriter {
         $fullChainEscaped = escapeshellarg("cert_file:{$config->fullChainFile}");
         $keyEscaped = escapeshellarg("keyFile:{$config->keyFile}");
 
-        $fh->writeln("  $domainsStr)");
-        $fh->writeln("    echo $fullChainEscaped");
-        $fh->writeln("    echo $keyEscaped");
-        $fh->writeln('    ;;');
+        $fh->writeLine("  $domainsStr)");
+        $fh->writeLine("    echo $fullChainEscaped");
+        $fh->writeLine("    echo $keyEscaped");
+        $fh->writeLine('    ;;');
 
     }
 }
