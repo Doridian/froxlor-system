@@ -21,7 +21,7 @@ fi
 
 rm -rf build
 
-postconf -e tls_server_sni_maps=proxy:hash:/etc/postfix/tls_server_sni_maps
+postconf -e tls_server_sni_maps=proxy:hash:/etc/postfix/tls_server_sni_maps inet_protocols=all
 postconf -X smtpd_tls_CAfile smtpd_tls_cert_file smtpd_tls_keyFile
 
 echo 'Running update...'
