@@ -9,17 +9,11 @@ class SafeTempFile {
     public function __construct(string $name, int $chmod = 0644) {
         $this->name = $name;
         $this->tmpName = $name . '.tmp';
-        $this->fh = fopen($this->tmpName, 'cb');
+        @unlink($this->tmpName);
+        $this->fh = fopen($this->tmpName, 'wb');
         if (!$this->fh) {
             throw new Exception("Could not open temporary file: $this->tmpName");
         }
-        if (!flock($this->fh, LOCK_EX | LOCK_NB)) {
-            throw new Exception("Could not lock temporary file: $this->tmpName");
-        }
-        if (!ftruncate($this->fh, 0)) {
-            throw new Exception("Could not truncate temporary file: $this->tmpName");
-        }
-        fseek($this->fh, 0);
         chmod($this->tmpName, $chmod);
     }
 
