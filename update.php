@@ -83,6 +83,7 @@ if ($oldHash === $newHash) {
         echo 'Forcing rebuild, but no changes detected.' . PHP_EOL;
     } else {
         echo 'No changes detected, exiting.' . PHP_EOL;
+        exit(0);
     }
 } else {
     echo 'Changes detected, updating TLS configurations.' . PHP_EOL;
