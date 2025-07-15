@@ -13,7 +13,7 @@ echo 'Rendering system configuration files...'
 rm -rf build && mkdir -p build
 
 find etc -type d -exec mkdir -p "build/"{} \;
-find etc -type f -exec /bin/sh -c 'envsubst < "$1" > "build/$1"' -- {} \;
+find etc -type f -exec /bin/sh -c 'envsubst \$INSTALLDIR' < "$1" > "build/$1"' -- {} \;
 
 cp -rv build/etc/* /etc/
 
