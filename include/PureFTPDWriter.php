@@ -16,13 +16,12 @@ class PureFTPDWriter extends ConfigWriter {
         $fh->writeLine($domain . ' ' . base64_encode($data));
     }
 
-    protected function writeHeader(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
-        if ($defaultConfig) {
-            $this->writeConfigDomain($fh, $defaultConfig, '*');
-        }
-    }
-
     protected function postSave(?TLSConfig $defaultConfig): void {
         verboseRun('postmap /etc/pure-ftpd/tls_server_sni_maps');
+
+        if ($defaultConfig) {
+            file_put_contents('/etc/pure-ftpd/conf/CertFile', $defaultConfig->fullChainFile . ',' .
+                                                                $defaultConfig->keyFile . PHP_EOL);
+        }
     }
 }
