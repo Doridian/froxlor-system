@@ -51,7 +51,7 @@ while ($certRow = $certRes->fetch_assoc()) {
     }
 }
 
-$gitRev = shell_exec('git rev-parse HEAD');
+$gitRev = trim(shell_exec('git rev-parse HEAD'));
 $newHash = $configurator->hash() . '|' . $gitRev;
 
 $hashFile = __DIR__ . '/tlsconfig.hash';
