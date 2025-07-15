@@ -1,11 +1,10 @@
---- pure-ftpd-wrapper.orig	2025-07-09 06:38:27.660434915 +0200
-+++ pure-ftpd-wrapper	2025-07-15 21:17:49.509721935 +0200
-@@ -91,6 +91,8 @@
+--- /usr/sbin/pure-ftpd-wrapper.orig	2025-07-09 06:38:27.660434915 +0200
++++ /usr/sbin/pure-ftpd-wrapper	2025-07-09 06:38:45.792580249 +0200
+@@ -91,6 +91,7 @@
  			'NoChmod' => ['-R'],
  			'NoRename' => ['-G'],
  			'NoTruncate' => ['-0'],
 +			'ExtCert' => [ '-3 %s', \&parse_string],
-+			'CertFile' => [ '-2 %s', \&parse_string],
  			'PassivePortRange' => ['-p %d:%d', \&parse_number_2],
  			'PerUserLimits' => ['-y %d:%d', \&parse_number_2],
  			'ProhibitDotFilesRead' => ['-X'],
