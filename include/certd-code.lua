@@ -48,3 +48,4 @@ if not sni_name then
 else
     handle_sni(sni_name)
 end
+os.exit(0)
