@@ -44,10 +44,10 @@ while ($certRow = $certRes->fetch_assoc()) {
         $keyFile
     );
 
-    foreach ($config->getWarnings() as $warning) {
+    foreach ($configurator->getWarnings() as $warning) {
         echo "Warning for $domain: $warning";
     }
-    $config->clearWarnings();
+    $configurator->clearWarnings();
 
     if ($domainId === 0) {
         $configurator->setDefault($config);
