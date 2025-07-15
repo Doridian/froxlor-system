@@ -51,13 +51,14 @@ while ($certRow = $certRes->fetch_assoc()) {
     }
 }
 
-
+// TODO: Add gitev to hash
 $newHash = $configurator->hash();
 
 $hashFile = __DIR__ . '/tlsconfig.hash';
 if (file_exists($hashFile)) {
     $oldHash = trim(file_get_contents($hashFile));
     if ($oldHash === $newHash) {
+        // TODO: Allow force update with cmdline option
         echo 'No changes detected, exiting.' . PHP_EOL;
         exit(0);
     }
