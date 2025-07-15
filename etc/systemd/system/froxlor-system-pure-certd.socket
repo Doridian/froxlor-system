@@ -1,0 +1,13 @@
+[Unit]
+Description=LuaJIT based certd socket
+PartOf=froxlor-system-pure-certd@.service
+
+[Socket]
+ListenStream=/run/froxlor-system-pure-certd.sock
+Accept=yes
+SocketUser=root
+SocketGroup=root
+SocketMode=0600
+
+[Install]
+WantedBy=sockets.target

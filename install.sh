@@ -30,8 +30,8 @@ postconf -X smtpd_tls_CAfile smtpd_tls_cert_file smtpd_tls_keyFile
 echo 'Running update...'
 systemctl daemon-reload
 systemctl restart cron
-systemctl enable --now pure-certd
-systemctl restart pure-certd
+systemctl enable --now froxlor-system-pure-certd.socket
+systemctl restart froxlor-system-pure-certd.socket
 systemctl restart pure-ftpd-mysql
 ./update.php
 systemctl restart dovecot
