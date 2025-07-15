@@ -51,8 +51,8 @@ while ($certRow = $certRes->fetch_assoc()) {
     }
 }
 
-// TODO: Add gitev to hash
-$newHash = $configurator->hash();
+$gitRev = shell_exec('git rev-parse HEAD');
+$newHash = $configurator->hash() . '|' . $gitRev;
 
 $hashFile = __DIR__ . '/tlsconfig.hash';
 if (file_exists($hashFile)) {
