@@ -36,7 +36,7 @@ function getSetting(string $group, string $name): string {
     return $value;
 }
 
-$ssl_dir = rtrim(getSetting('system', 'customer_ssl_path'), '/') . '/';
+$sslDir = rtrim(getSetting('system', 'customer_ssl_path'), '/') . '/';
 $fqdn = getSetting('system', 'hostname');
 
 function verboseRun(string $command): void {
