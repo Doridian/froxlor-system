@@ -9,9 +9,6 @@ require_once 'include/DovecotWriter.php';
 require_once 'include/PureFTPDWriter.php';
 require_once 'include/TLSConfigurator.php';
 
-// TODO: Detect if certificates were updated since last run
-//       and only update if they were changed.
-
 $configurator = new TLSConfigurator([
     new PostfixWriter(),
     new DovecotWriter(),
