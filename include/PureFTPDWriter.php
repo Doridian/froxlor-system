@@ -5,41 +5,24 @@ require_once 'ConfigWriter.php';
 
 class PureFTPDWriter extends ConfigWriter {
     public function __construct() {
-        parent::__construct('/etc/pure-ftpd/certd.sh', 0755);
+        parent::__construct('/etc/pure-ftpd/tls_server_sni_maps');
+    }
+
+    protected function writeConfigDomain(SafeTempFile $fh, TLSConfig $config, string $domain): void {
+        $data = 'action:strict' . PHP_EOL .
+                'cert_file:' . $config->fullChainFile . PHP_EOL .
+                'key_file:' . $config->keyFile . PHP_EOL .
+                'end' . PHP_EOL;
+        $fh->writeLine($domain . ' ' . base64_encode($data));
     }
 
     protected function writeHeader(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
-        $fh->writeLine('#!/bin/bash');
-        $fh->writeLine('set -euo pipefail');
-        $fh->writeLine('case "$CERTD_SNI_NAME" in');
-    }
-
-    protected function writeFooter(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
         if ($defaultConfig) {
-            $this->writeConfigInternal($fh, $defaultConfig, '*');
-        } else {
-            $fh->writeLine('*)');
-            $fh->writeLine("    echo 'action:default'");
-            $fh->writeLine('    ;;');
+            $this->writeConfigDomain($fh, $defaultConfig, '*');
         }
-        $fh->writeLine('esac');
-        $fh->writeLine("echo 'end'");
     }
 
-    protected function writeConfig(SafeTempFile $fh, TLSConfig $config): void {
-        $domainsStr = implode('|', array_map('escapeshellarg', $config->getDomains()));
-        $this->writeConfigInternal($fh, $config, $domainsStr);
-    }
-
-    private function writeConfigInternal(SafeTempFile $fh, TLSConfig $config, string $domainsStr): void {
-        $fullChainEscaped = escapeshellarg("cert_file:{$config->fullChainFile}");
-        $keyEscaped = escapeshellarg("keyFile:{$config->keyFile}");
-
-        $fh->writeLine("  $domainsStr)");
-        $fh->writeLine("    echo 'action:strict'");
-        $fh->writeLine("    echo $fullChainEscaped");
-        $fh->writeLine("    echo $keyEscaped");
-        $fh->writeLine('    ;;');
-
+    protected function postSave(?TLSConfig $defaultConfig): void {
+        verboseRun('postmap /etc/pure-ftpd/tls_server_sni_maps');
     }
 }
