@@ -51,14 +51,24 @@ while ($certRow = $certRes->fetch_assoc()) {
     }
 }
 
+$forceBuild = false;
+foreach ($argv as $arg) {
+    switch ($arg) {
+    case '--force':
+    case '-f':
+        echo 'Forcing rebuild of TLS configurations.' . PHP_EOL;
+        $forceBuild = true;
+        break;
+    }
+}
+
 $gitRev = trim(shell_exec('git rev-parse HEAD'));
 $newHash = $configurator->hash() . '|' . $gitRev;
 
 $hashFile = __DIR__ . '/tlsconfig.hash';
 if (file_exists($hashFile)) {
     $oldHash = trim(file_get_contents($hashFile));
-    if ($oldHash === $newHash) {
-        // TODO: Allow force update with cmdline option
+    if (!$forceBuild && $oldHash === $newHash) {
         echo 'No changes detected, exiting.' . PHP_EOL;
         exit(0);
     }
