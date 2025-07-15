@@ -11,13 +11,16 @@ class PureFTPDWriter extends ConfigWriter {
     protected function writeHeader(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
         $fh->writeLine('#!/bin/bash');
         $fh->writeLine('set -euo pipefail');
-        $fh->writeLine("echo 'action:strict'");
         $fh->writeLine('case "$CERTD_SNI_NAME" in');
     }
 
     protected function writeFooter(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
         if ($defaultConfig) {
             $this->writeConfigInternal($fh, $defaultConfig, '*');
+        } else {
+            $fh->writeLine('*)');
+            $fh->writeLine("    echo 'action:default'");
+            $fh->writeLine('    ;;');
         }
         $fh->writeLine('esac');
         $fh->writeLine("echo 'end'");
@@ -33,6 +36,7 @@ class PureFTPDWriter extends ConfigWriter {
         $keyEscaped = escapeshellarg("keyFile:{$config->keyFile}");
 
         $fh->writeLine("  $domainsStr)");
+        $fh->writeLine("    echo 'action:strict'");
         $fh->writeLine("    echo $fullChainEscaped");
         $fh->writeLine("    echo $keyEscaped");
         $fh->writeLine('    ;;');
