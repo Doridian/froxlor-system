@@ -4,7 +4,7 @@ Description=pure-certd
 [Service]
 Type=simple
 Restart=always
-ExecStart=/usr/sbin/pure-certd --run /etc/pure-ftpd/certd.sh --socket /var/run/pure-certd.sock --pidfile /var/run/pure-certd.pid --uid 65534 --gid 65534
+ExecStart=/usr/sbin/pure-certd --run /etc/pure-ftpd/certd.sh --socket /run/pure-certd.sock --pidfile /run/pure-certd.pid --uid 65534 --gid 65534
 
 [Install]
 WantedBy=multi-user.target
