@@ -9,7 +9,7 @@ class SafeTempFile {
     public function __construct(string $name, int $chmod = 0644) {
         $this->name = $name;
         $this->tmpName = $name . '.tmp';
-        $this->fh = fopen($this->tmpName, 'r+b');
+        $this->fh = fopen($this->tmpName, 'cb');
         if (!$this->fh) {
             throw new Exception("Could not open temporary file: $this->tmpName");
         }
