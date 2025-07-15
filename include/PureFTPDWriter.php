@@ -14,7 +14,7 @@ class PureFTPDWriter extends ConfigWriter {
         $data = 'action:strict' . PHP_EOL .
                 'cert_file:' . $config->fullChainFile . PHP_EOL .
                 'key_file:' . $config->keyFile . PHP_EOL .
-                'end' . PHP_EOL;
+                'end';
         $fh->writeLine($domain . ' ' . base64_encode($data));
     }
 
