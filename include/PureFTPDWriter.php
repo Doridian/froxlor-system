@@ -24,7 +24,8 @@ class PureFTPDWriter extends ConfigWriter {
         if ($defaultConfig) {
             $defaultData = $defaultConfig->fullChainFile . ',' .
                            $defaultConfig->keyFile . PHP_EOL;
-            if (file_get_contents(PURE_FTPD_CERTFILE) !== $defaultData) {
+            if (!file_exists(PURE_FTPD_CERTFILE) ||
+                    file_get_contents(PURE_FTPD_CERTFILE) !== $defaultData) {
                 file_put_contents(PURE_FTPD_CERTFILE, $defaultData);
                 verboseRun('systemctl restart pure-ftpd-mysql');
             }
