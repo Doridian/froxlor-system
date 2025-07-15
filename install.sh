@@ -6,6 +6,8 @@ cd "$(dirname "$0")"
 
 export INSTALLDIR="$(pwd)"
 
+apt-get -y install luajit unattended-upgrades restic screen htop phpmyadmin sudo mariadb-backup ncdu git nfs-common
+
 echo 'Rendering system configuration files...'
 rm -rf build && mkdir -p build
 
