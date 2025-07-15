@@ -9,6 +9,15 @@ require_once 'include/DovecotWriter.php';
 require_once 'include/PureFTPDWriter.php';
 require_once 'include/TLSConfigurator.php';
 
+$hashFile = __DIR__ . '/tlsconfig.hash';
+$hashFH = fopen($hashFile, 'c+b');
+if (!$hashFH) {
+    throw new Exception("Could not open hash file: $hashFile");
+}
+if (!flock($hashFH, LOCK_EX | LOCK_NB)) {
+    throw new Exception("Could not lock hash file: $hashFile");
+}
+
 $configurator = new TLSConfigurator([
     new PostfixWriter(),
     new DovecotWriter(),
@@ -68,14 +77,6 @@ if ($forceBuild) {
 $gitRev = trim(shell_exec('git rev-parse HEAD'));
 $newHash = $configurator->hash() . '|' . $gitRev;
 
-$hashFile = __DIR__ . '/tlsconfig.hash';
-$hashFH = fopen($hashFile, 'c+b');
-if (!$hashFH) {
-    throw new Exception("Could not open hash file: $hashFile");
-}
-if (!flock($hashFH, LOCK_EX | LOCK_NB)) {
-    throw new Exception("Could not lock hash file: $hashFile");
-}
 $oldHash = trim(fgets($hashFH, 65536));
 
 if ($oldHash === $newHash) {
