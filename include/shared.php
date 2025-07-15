@@ -43,3 +43,7 @@ function verboseRun(string $command): void {
     echo "Running: $command" . PHP_EOL;
     passthru($command);
 }
+
+function escapeLuaString(string $str): string {
+    return "'" . addslashes($str) . "'";
+}

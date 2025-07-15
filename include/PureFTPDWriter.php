@@ -26,16 +26,16 @@ class PureFTPDWriter extends ConfigWriter {
     }
 
     protected function writeConfigDomain(SafeTempFile $fh, TLSConfig $config, string $domain): void {
-        $fh->writeLine('    [' . escapeshellarg($domain) . '] = ' . $this->makeConfigInternal($fh, $config) . ',');
-    }
-
-    private function makeConfigInternal(SafeTempFile $fh, TLSConfig $config): string {
-        $certFile = escapeshellarg($config->fullChainFile);
-        $keyFile = escapeshellarg($config->keyFile);
-        return '{' . $certFile . ', ' . $keyFile . '}';
+        $fh->writeLine('    [' . escapeLuaString($domain) . '] = ' . $this->makeConfigInternal($fh, $config) . ',');
     }
 
     protected function postSave(?TLSConfig $defaultConfig): void {
         verboseRun('luajit -b /etc/pure-ftpd/certd.lua /etc/pure-ftpd/certd.luac');
+    }
+
+    private function makeConfigInternal(SafeTempFile $fh, TLSConfig $config): string {
+        $certFile = escapeLuaString($config->fullChainFile);
+        $keyFile = escapeLuaString($config->keyFile);
+        return '{' . $certFile . ', ' . $keyFile . '}';
     }
 }
