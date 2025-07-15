@@ -1,5 +1,10 @@
---local DOMAIN_CONFIGS = {}
---local DEFAULT_CONFIG = nil
+--[[
+local DOMAIN_CONFIGS = {
+    ['example.com'] = {'/path/to/cert.pem', '/path/to/key.pem'},
+    ['anotherdomain.com'] = {'/path/to/another_cert.pem', '/path/to/another_key.pem'},
+}
+local DEFAULT_CONFIG = nil or {'/path/to/default_cert.pem', '/path/to/default_key.pem'}
+]]
 
 local print = print
 local sni_name = nil
