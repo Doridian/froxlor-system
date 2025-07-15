@@ -15,9 +15,9 @@ class DovecotWriter extends ConfigWriter {
         }
     }
 
-    protected function writeConfigDomain(SafeTempFile $fh, TLSConfig $config, string $domain): void {
-        // TODO: dovecot supprorts multiple domains in one config block
-        $fh->writeLine("local_name $domain {");
+    protected function writeConfig(SafeTempFile $fh, TLSConfig $config): void {
+        $domainsStr = implode('" "', array_map('escapeshellarg', $config->getDomains()));
+        $fh->writeLine('local_name "' . $domainsStr . '" {');
         $fh->writeLine('  ssl_cert = <' . $config->fullChainFile);
         $fh->writeLine('  ssl_key = <' . $config->keyFile);
         $fh->writeLine('}');
