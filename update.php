@@ -56,10 +56,13 @@ foreach ($argv as $arg) {
     switch ($arg) {
     case '--force':
     case '-f':
-        echo 'Forcing rebuild of TLS configurations.' . PHP_EOL;
         $forceBuild = true;
         break;
     }
+}
+
+if ($forceBuild) {
+    echo 'Forcing rebuild of TLS configurations.' . PHP_EOL;
 }
 
 $gitRev = trim(shell_exec('git rev-parse HEAD'));
