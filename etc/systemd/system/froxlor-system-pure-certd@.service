@@ -1,13 +1,15 @@
 [Unit]
-Description=LuaJIT based certd socket
-PartOf=froxlor-system-pure-certd@.service
+Description=LuaJIT based certd
+After=froxlor-system-pure-certd.socket
 
-[Socket]
-ListenStream=/run/froxlor-system-pure-certd.sock
-Accept=yes
-SocketUser=root
-SocketGroup=root
-SocketMode=0600
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/luajit /etc/pure-ftpd/certd.lua
+StandardInput=socket
+StandardOutput=socket
+StandardError=journal
+TimeoutStopSec=5
+DynamicUser=yes
 
 [Install]
-WantedBy=sockets.target
+WantedBy=multi-user.target
