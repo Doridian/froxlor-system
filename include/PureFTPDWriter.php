@@ -4,42 +4,34 @@ declare (strict_types=1);
 require_once 'ConfigWriter.php';
 
 class PureFTPDWriter extends ConfigWriter {
+    private readonly string $baseCode;
+
     public function __construct() {
-        parent::__construct('/etc/pure-ftpd/certd.sh', 0755);
+        parent::__construct('/etc/pure-ftpd/certd.lua', 0644);
+        $this->baseCode = file_get_contents(__DIR__ . '/certd-code.lua');
     }
 
     protected function writeHeader(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
-        $fh->writeLine('#!/bin/bash');
-        $fh->writeLine('set -euo pipefail');
-        $fh->writeLine('case "$CERTD_SNI_NAME" in');
+        if ($defaultConfig) {
+            $fh->writeLine('local DEFAULT_CONFIG = ' . $this->makeConfigInternal($fh, $defaultConfig) . ';');
+        } else {
+            $fh->writeLine('local DEFAULT_CONFIG = nil');
+        }
+        $fh->writeLine('local DOMAIN_CONFIGS = {');
     }
 
     protected function writeFooter(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
-        if ($defaultConfig) {
-            $this->writeConfigInternal($fh, $defaultConfig, '*');
-        } else {
-            $fh->writeLine('*)');
-            $fh->writeLine("    echo 'action:default'");
-            $fh->writeLine('    ;;');
-        }
-        $fh->writeLine('esac');
-        $fh->writeLine("echo 'end'");
+        $fh->writeLine('}');
+        $fh->write($this->baseCode);
     }
 
-    protected function writeConfig(SafeTempFile $fh, TLSConfig $config): void {
-        $domainsStr = implode('|', array_map('escapeshellarg', $config->getDomains()));
-        $this->writeConfigInternal($fh, $config, $domainsStr);
+    protected function writeConfigDomain(SafeTempFile $fh, TLSConfig $config, string $domain): void {
+        $fh->writeLine('    [' . escapeshellarg($domain) . '] = ' . $this->makeConfigInternal($fh, $config) . ',');
     }
 
-    private function writeConfigInternal(SafeTempFile $fh, TLSConfig $config, string $domainsStr): void {
-        $fullChainEscaped = escapeshellarg("cert_file:{$config->fullChainFile}");
-        $keyEscaped = escapeshellarg("keyFile:{$config->keyFile}");
-
-        $fh->writeLine("  $domainsStr)");
-        $fh->writeLine("    echo 'action:strict'");
-        $fh->writeLine("    echo $fullChainEscaped");
-        $fh->writeLine("    echo $keyEscaped");
-        $fh->writeLine('    ;;');
-
+    private function makeConfigInternal(SafeTempFile $fh, TLSConfig $config): string {
+        $certFile = escapeshellarg($config->fullChainFile);
+        $keyFile = escapeshellarg($config->keyFile);
+        return '{' . $certFile . ', ' . $keyFile . '}';
     }
 }
