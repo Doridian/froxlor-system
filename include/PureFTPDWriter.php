@@ -34,4 +34,8 @@ class PureFTPDWriter extends ConfigWriter {
         $keyFile = escapeshellarg($config->keyFile);
         return '{' . $certFile . ', ' . $keyFile . '}';
     }
+
+    protected function postSave(?TLSConfig $defaultConfig): void {
+        verboseRun('luajit -b /etc/pure-ftpd/certd.lua /etc/pure-ftpd/certd.luac');
+    }
 }
