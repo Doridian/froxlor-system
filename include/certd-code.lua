@@ -7,6 +7,7 @@ local DEFAULT_CONFIG = nil or {'/path/to/default_cert.pem', '/path/to/default_ke
 ]]
 
 local print = print
+local read = io.read
 local sni_name = nil
 
 local SNI_NAME_PREFIX = 'sni_name:'
@@ -39,7 +40,7 @@ end
 
 local line
 while true do
-    line = io.read('*l')
+    line = read('*l')
     if line == 'end' then
         break
     end
