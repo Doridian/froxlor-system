@@ -19,6 +19,7 @@ class SafeTempFile {
         if (!ftruncate($this->fh, 0)) {
             throw new Exception("Could not truncate temporary file: $this->tmpName");
         }
+        fseek($this->fh, 0);
         chmod($this->tmpName, $chmod);
     }
 

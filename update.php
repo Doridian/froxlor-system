@@ -69,16 +69,27 @@ $gitRev = trim(shell_exec('git rev-parse HEAD'));
 $newHash = $configurator->hash() . '|' . $gitRev;
 
 $hashFile = __DIR__ . '/tlsconfig.hash';
-if (file_exists($hashFile)) {
-    $oldHash = trim(file_get_contents($hashFile));
-    if (!$forceBuild && $oldHash === $newHash) {
-        echo 'No changes detected, exiting.' . PHP_EOL;
-        exit(0);
-    }
-    echo 'Changes detected, updating TLS configurations.' . PHP_EOL;
-} else {
-    $oldHash = '';
-    echo 'No previous hash file found, updating config and creating new one.' . PHP_EOL;
+$hashFH = fopen($hashFile, 'c+b');
+if (!$hashFH) {
+    throw new Exception("Could not open hash file: $hashFile");
 }
+if (!flock($hashFH, LOCK_EX | LOCK_NB)) {
+    throw new Exception("Could not lock hash file: $hashFile");
+}
+$oldHash = trim(fgets($hashFH, 65536));
+
+if ($oldHash === $newHash) {
+    if ($forceBuild) {
+        echo 'Forcing rebuild, but no changes detected.' . PHP_EOL;
+    } else {
+        echo 'No changes detected, exiting.' . PHP_EOL;
+    }
+} else {
+    echo 'Changes detected, updating TLS configurations.' . PHP_EOL;
+}
+
 $configurator->save();
-file_put_contents($hashFile, $newHash . PHP_EOL);
+
+ftruncate($hashFH, 0) or throw new Exception("Could not truncate hash file: $hashFile");
+fseek($hashFH, 0);
+fwrite($hashFH, $newHash . PHP_EOL) or throw new Exception("Could not write to hash file: $hashFile");
