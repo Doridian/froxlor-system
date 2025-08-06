@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 export INSTALLDIR="$(pwd)"
 
 apt-get -y update
-apt-get -y install unattended-upgrades restic screen htop phpmyadmin sudo mariadb-backup ncdu git nfs-common rsync
+apt-get -y install unattended-upgrades restic screen htop phpmyadmin sudo mariadb-backup ncdu git rsync
 
 echo 'Rendering system configuration files...'
 rm -rf build && mkdir -p build
