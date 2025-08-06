@@ -48,7 +48,7 @@ class TLSConfigurator implements ITLSConfigHolder {
             foreach ($sanArray as $san) {
                 $san = strtolower(trim($san));
                 $sanSplit = explode(':', $san, 2);
-                if (count($sanSplit) !== 2 || $sanSplit[0] !== 'dns') {
+                if (count($sanSplit) !== 2 || trim($sanSplit[0]) !== 'dns') {
                     continue;
                 }
                 $san = trim($sanSplit[1]);
