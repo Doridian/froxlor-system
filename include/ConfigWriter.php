@@ -44,7 +44,7 @@ abstract class ConfigWriter {
     }
 
     protected function writeConfigDomain(SafeTempFile $fh, TLSConfig $config, string $domain): void {
-        throw new BadMethodCallException("writeConfigDomain must be implemented in subclass");
+        throw new BadMethodCallException("writeConfigDomain or writeConfig must be implemented in subclass");
     }
 
     protected function writeFooter(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
@@ -53,6 +53,5 @@ abstract class ConfigWriter {
 
     protected function postSave(?TLSConfig $defaultConfig): void {
         // Default implementation does nothing
-        // Subclasses can override this method to perform additional actions after saving
     }
 }
