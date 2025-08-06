@@ -33,6 +33,6 @@ systemctl restart cron
 systemctl enable --now pure-certd
 systemctl restart pure-certd
 systemctl restart pure-ftpd-mysql
-./update.php
+./update.php --force
 systemctl restart dovecot
 systemctl restart postfix
