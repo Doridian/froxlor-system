@@ -12,8 +12,8 @@ apt-get -y install unattended-upgrades restic screen htop phpmyadmin sudo mariad
 echo 'Rendering system configuration files...'
 rm -rf build && mkdir -p build
 
-find etc -type d -print0 | xargs -0 -n1 mkdir -p "build/$1"
-find etc -type f -print0 | xargs -0 -n1 sed "s~__INSTALLDIR__~${INSTALLDIR}~g" "build/$1"
+find etc -type d -print0 | xargs -0 -i__FNAME__ mkdir -p "build/__FNAME__"
+find etc -type f -print0 | xargs -0 -i__FNAME__ sed "s~__INSTALLDIR__~${INSTALLDIR}~g" "build/__FNAME__"
 
 cp -rv build/etc/* /etc/
 
