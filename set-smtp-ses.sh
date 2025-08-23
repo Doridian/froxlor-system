@@ -15,5 +15,8 @@ postconf 'smtp_sasl_password_maps=hash:/etc/postfix/sasl_passwd'
 postconf 'smtp_sasl_security_options=noanonymous'
 postconf 'relayhost=[email-smtp.eu-west-1.amazonaws.com]:587'
 postconf 'smtp_sasl_auth_enable=yes'
+postconf 'smtpd_tls_security_level=may'
+postconf 'smtp_use_tls=yes'
+postconf 'smtpd_use_tls=yes'
 
 systemctl restart postfix
