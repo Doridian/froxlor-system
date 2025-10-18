@@ -2,6 +2,8 @@
 <?php
 declare (strict_types=1);
 
+chdir(__DIR__);
+
 require_once 'include/shared.php';
 
 require_once 'include/PostfixWriter.php';
