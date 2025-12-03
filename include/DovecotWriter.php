@@ -8,17 +8,20 @@ class DovecotWriter extends ConfigWriter {
         parent::__construct('/etc/dovecot/conf.d/zzz-tls-sni.conf');
     }
 
+    protected function writeTLSConfig(SafeTempFile $fh, TLSConfig $config, string $prefix): void {
+        $fh->writeLine($prefix . 'ssl_client_cert_file = ' . $config->fullChainFile);
+        $fh->writeLine($prefix . 'ssl_client_key_file = ' . $config->keyFile);
+    }
+
     protected function writeHeader(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
         if ($defaultConfig) {
-            $fh->writeLine('ssl_server_cert_file = ' . $defaultConfig->fullChainFile);
-            $fh->writeLine('ssl_server_key_file = ' . $defaultConfig->keyFile);
+            $this->writeTLSConfig($fh, $defaultConfig, '');
         }
     }
 
     protected function writeConfigDomain(SafeTempFile $fh, TLSConfig $config, string $domain): void {
         $fh->writeLine("local_name $domain {");
-        $fh->writeLine('  ssl_server_cert_file = ' . $config->fullChainFile);
-        $fh->writeLine('  ssl_server_key_file = ' . $config->keyFile);
+        $this->writeTLSConfig($fh, $config, '  ');
         $fh->writeLine('}');
     }
 
