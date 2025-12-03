@@ -10,15 +10,15 @@ class DovecotWriter extends ConfigWriter {
 
     protected function writeHeader(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
         if ($defaultConfig) {
-            $fh->writeLine('ssl_cert_file = ' . $defaultConfig->fullChainFile);
-            $fh->writeLine('ssl_key_file = ' . $defaultConfig->keyFile);
+            $fh->writeLine('ssl_server_cert_file = ' . $defaultConfig->fullChainFile);
+            $fh->writeLine('ssl_server_key_file = ' . $defaultConfig->keyFile);
         }
     }
 
     protected function writeConfigDomain(SafeTempFile $fh, TLSConfig $config, string $domain): void {
         $fh->writeLine("local_name $domain {");
-        $fh->writeLine('  ssl_cert_file = ' . $config->fullChainFile);
-        $fh->writeLine('  ssl_key_file = ' . $config->keyFile);
+        $fh->writeLine('  ssl_server_cert_file = ' . $config->fullChainFile);
+        $fh->writeLine('  ssl_server_key_file = ' . $config->keyFile);
         $fh->writeLine('}');
     }
 
