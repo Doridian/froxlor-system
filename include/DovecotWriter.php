@@ -9,8 +9,8 @@ class DovecotWriter extends ConfigWriter {
     }
 
     protected function writeTLSConfig(SafeTempFile $fh, TLSConfig $config, string $prefix): void {
-        $fh->writeLine($prefix . 'ssl_client_cert_file = ' . $config->fullChainFile);
-        $fh->writeLine($prefix . 'ssl_client_key_file = ' . $config->keyFile);
+        $fh->writeLine($prefix . 'ssl_server_cert_file = ' . $config->fullChainFile);
+        $fh->writeLine($prefix . 'ssl_server_key_file = ' . $config->keyFile);
     }
 
     protected function writeHeader(SafeTempFile $fh, ?TLSConfig $defaultConfig): void {
