@@ -1,2 +1,3 @@
-13 */4 * * * root /usr/bin/nice -n 5 '__INSTALLDIR__/update.php' >'__INSTALLDIR__/update.log' 2>&1
-13 3 * * * root /usr/bin/nice -n 5 '__INSTALLDIR__/backup.sh' >'__INSTALLDIR__/backup.log' 2>&1
+13 0,8,12,16,20 * * * root /usr/bin/nice -n 5 '__INSTALLDIR__/update.php' >'__INSTALLDIR__/update.log' 2>&1
+13 4 * * * root /usr/bin/nice -n 5 '__INSTALLDIR__/update.php' --force >'__INSTALLDIR__/update-force.log' 2>&1
+13 5 * * * root /usr/bin/nice -n 5 '__INSTALLDIR__/backup.sh' >'__INSTALLDIR__/backup.log' 2>&1
