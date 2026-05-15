@@ -41,5 +41,7 @@ $fqdn = getSetting('system', 'hostname');
 
 function verboseRun(string $command): void {
     echo "Running: $command" . PHP_EOL;
-    passthru($command);
+    if (passthru($command) === false) {
+        dieError("Command failed: $command");
+    }
 }
