@@ -29,6 +29,7 @@ class OpenDKIMWriter extends ConfigWriter {
         $fh->writeLine('OversignHeaders From');
         $fh->writeLine('UserID opendkim');
         $fh->writeLine('UMask 007');
+        $fh->writeLine('Socket local:/var/spool/postfix/run/opendkim/opendkim.sock');
         $fh->writeLine('PidFile /run/opendkim/opendkim.pid');
         $fh->writeLine('TrustAnchorFile /usr/share/dns/root.key');
 
