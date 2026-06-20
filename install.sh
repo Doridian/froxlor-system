@@ -8,9 +8,9 @@ export INSTALLDIR="$(pwd)"
 
 apt-get -y update
 apt-get -y install unattended-upgrades restic screen htop phpmyadmin sudo mariadb-backup ncdu git rsync opendkim
-mkdir -p /etc/opendkim/keys /var/lib/opendkim
+mkdir -p /etc/opendkim/keys /var/spool/postfix/opendkim
 chmod 700 /etc/opendkim/keys
-chown opendkim:opendkim /etc/opendkim/keys /var/lib/opendkim
+chown opendkim:opendkim /etc/opendkim/keys /var/spool/postfix/opendkim
 usermod -a -G opendkim postfix
 
 echo 'Rendering system configuration files...'
