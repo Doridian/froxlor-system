@@ -6,7 +6,7 @@ class SafeTempFile {
     private readonly string $tmpName;
     private mixed $fh;
 
-    public function __construct(string $name, int $chmod = 0644, int|string $chown = -1) {
+    public function __construct(string $name, int $chmod = 0644) {
         $this->name = $name;
         $this->tmpName = $name . '.tmp';
         @unlink($this->tmpName);
@@ -15,9 +15,6 @@ class SafeTempFile {
             throw new Exception("Could not open temporary file: $this->tmpName");
         }
         chmod($this->tmpName, $chmod);
-        if ($chown !== -1) {
-            chown($this->tmpName, $chown);
-        }
     }
 
     public function __destruct() {
