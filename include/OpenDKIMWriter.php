@@ -54,9 +54,16 @@ class OpenDKIMWriter extends ConfigWriter {
 
         $selectorFqdn = "$hostname._domainkey.$domain";
         $keyDir = "/etc/opendkim/keys/$domain";
-        verboseRun("sudo -u opendkim /bin/bash -c 'mkdir -p $keyDir && opendkim-genkey -b 2048 -d $domain -s $hostname -D $keyDir'");
+        $keyFile = "$keyDir/$hostname.private";
+        if (!file_exists($keyFile)) {
+            echo "Generating OpenDKIM key for $domain" . PHP_EOL;
+            verboseRun("sudo -u opendkim /bin/bash -c 'mkdir -p $keyDir && opendkim-genkey -b 2048 -d $domain -s $hostname -D $keyDir'");
+        } else {
+            echo "OpenDKIM key for $domain already exists, skipping generation" . PHP_EOL;
+            return;
+        }
 
-        $this->keyTable->writeLine("$selectorFqdn $domain:$hostname:$keyDir/$hostname.private");
+        $this->keyTable->writeLine("$selectorFqdn $domain:$hostname:$keyFile");
         $this->signingTable->writeLine("*@$domain $selectorFqdn");
         $this->trustedHosts->writeLine($domain);
     }
