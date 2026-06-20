@@ -71,6 +71,7 @@ class OpenDKIMWriter extends ConfigWriter {
         $this->keyTable->save();
         $this->signingTable->save();
         $this->trustedHosts->save();
+        chown($this->file, 'opendkim');
         verboseRun('systemctl reload opendkim');
     }
 }
