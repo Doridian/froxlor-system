@@ -38,4 +38,5 @@ systemctl restart pure-certd
 systemctl restart pure-ftpd-mysql
 ./update.php --force
 systemctl restart dovecot
+systemctl restart opendkim
 systemctl restart postfix
