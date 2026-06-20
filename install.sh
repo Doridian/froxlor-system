@@ -8,9 +8,9 @@ export INSTALLDIR="$(pwd)"
 
 apt-get -y update
 apt-get -y install unattended-upgrades restic screen htop phpmyadmin sudo mariadb-backup ncdu git rsync opendkim
-mkdir -p /etc/opendkim/keys /var/spool/postfix/opendkim
+mkdir -p /etc/opendkim/keys
 chmod 700 /etc/opendkim/keys
-chown opendkim:opendkim /etc/opendkim/keys /var/spool/postfix/opendkim
+chown opendkim:opendkim /etc/opendkim/keys
 usermod -a -G opendkim postfix
 
 echo 'Rendering system configuration files...'
@@ -28,7 +28,7 @@ fi
 
 rm -rf build
 
-postconf -e tls_server_sni_maps=proxy:hash:/etc/postfix/tls_server_sni_maps inet_protocols=all smtpd_milters=unix:/var/lib/opendkim/opendkim.sock 'non_smtpd_milters=$smtpd_milters' milter_default_action=accept
+postconf -e tls_server_sni_maps=proxy:hash:/etc/postfix/tls_server_sni_maps inet_protocols=all smtpd_milters=unix:/run/opendkim/opendkim.sock 'non_smtpd_milters=$smtpd_milters' milter_default_action=accept
 postconf -X smtpd_tls_CAfile smtpd_tls_cert_file smtpd_tls_keyFile
 
 echo 'Running update...'
