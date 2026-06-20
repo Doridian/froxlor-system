@@ -60,7 +60,6 @@ class OpenDKIMWriter extends ConfigWriter {
             verboseRun("sudo -u opendkim /bin/bash -c 'mkdir -p $keyDir && opendkim-genkey -b 2048 -d $domain -s $hostname -D $keyDir'");
         } else {
             echo "OpenDKIM key for $domain already exists, skipping generation" . PHP_EOL;
-            return;
         }
 
         $this->keyTable->writeLine("$selectorFqdn $domain:$hostname:$keyFile");
