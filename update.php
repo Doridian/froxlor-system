@@ -44,7 +44,6 @@ while ($certRow = $certRes->fetch_assoc()) {
             echo "Skipping $domain, fullchain file does not exist" . PHP_EOL;
             continue;
         }
-        echo "Fullchain file for $domain does not exist, but cert file exists. Using cert file as fullchain." . PHP_EOL;
     }
     $keyFile = $sslDir . $domain . '.key';
     if (!file_exists($keyFile)) {
