@@ -7,7 +7,10 @@ cd "$(dirname "$0")"
 export INSTALLDIR="$(pwd)"
 
 apt-get -y update
-apt-get -y install unattended-upgrades restic screen htop phpmyadmin sudo mariadb-backup ncdu git rsync
+apt-get -y install unattended-upgrades restic screen htop phpmyadmin sudo mariadb-backup ncdu git rsync opendkim
+mkdir -p /etc/opendkim/keys
+chmod 700 /etc/opendkim/keys
+chown opendkim:opendkim /etc/opendkim/keys
 
 echo 'Rendering system configuration files...'
 rm -rf build && mkdir -p build

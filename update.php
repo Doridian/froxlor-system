@@ -9,6 +9,7 @@ require_once 'include/shared.php';
 require_once 'include/PostfixWriter.php';
 require_once 'include/DovecotWriter.php';
 require_once 'include/PureFTPDWriter.php';
+require_once 'include/OpenDKIMWriter.php';
 require_once 'include/TLSConfigurator.php';
 
 $hashFile = __DIR__ . '/tlsconfig.hash';
@@ -24,6 +25,7 @@ $configurator = new TLSConfigurator([
     new PostfixWriter(),
     new DovecotWriter(),
     new PureFTPDWriter(),
+    new OpenDKIMWriter()
 ]);
 
 $certRes = $db->query('SELECT d.domain AS domain, s.domainid AS domain_id, s.ssl_cert_file AS ssl_cert_data FROM domain_ssl_settings s LEFT JOIN panel_domains d ON d.id = s.domainid;');
