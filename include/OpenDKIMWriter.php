@@ -60,11 +60,11 @@ class OpenDKIMWriter extends ConfigWriter {
             @mkdir($keyDir);
             chmod($keyDir, 0750);
             chown($keyDir, 0);
-            chgrp($keyDir, 'opendkim');
+            chgrp($keyDir, 'opendkim-keys');
             verboseRun("opendkim-genkey -b 2048 -d $domain -s $hostname -D $keyDir");
             chmod($keyFile, 0640);
             chown($keyFile, 0);
-            chgrp($keyFile, 'opendkim');
+            chgrp($keyFile, 'opendkim-keys');
         }
 
         $this->keyTable->writeLine("$selectorFqdn $domain:$hostname:$keyFile");
