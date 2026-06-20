@@ -9,16 +9,18 @@ require_once 'ITLSConfigHolder.php';
 abstract class ConfigWriter {
     protected readonly string $file;
     protected readonly int $mode;
+    protected readonly int|string $chown;
     protected readonly bool $writeDefault;
 
-    protected function __construct(string $file, int $mode = 0644, bool $writeDefault = false) {
+    protected function __construct(string $file, int $mode = 0644, int|string $chown = -1, bool $writeDefault = false) {
         $this->file = $file;
         $this->mode = $mode;
+        $this->chown = $chown;
         $this->writeDefault = $writeDefault;
     }
 
     public function save(ITLSConfigHolder $configHolder): void {
-        $fh = new SafeTempFile($this->file, $this->mode);
+        $fh = new SafeTempFile($this->file, $this->mode, $this->chown);
         $defaultConfig = $configHolder->getDefaultConfig();
         $this->writeHeader($fh, $defaultConfig);
         foreach ($configHolder->getConfigs() as $config) {
